@@ -1,304 +1,61 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>MARO | متجر مارو الاحترافي</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1264ff">
+  <meta name="description" content="متجر مارو — شحن ألعاب، بطاقات رقمية، اشتراكات وخدمات إلكترونية بسرعة وأمان.">
+  <link rel="icon" href="/maro-logo.svg" type="image/svg+xml">
+  <title>متجر مارو | شحن ألعاب وخدمات رقمية</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
-    
-    :root {
-      --bg: #050505;
-      --surface: rgba(255, 255, 255, 0.03);
-      --surface-border: rgba(255, 255, 255, 0.08);
-      --text-main: #ffffff;
-      --text-muted: #888888;
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --accent: #ff6b00;
-      --accent-glow: rgba(255, 107, 0, 0.4);
-      --font: 'Tajawal', sans-serif;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body {
-      font-family: var(--font);
-      background-color: var(--bg);
-      color: var(--text-main);
-      min-height: 100vh;
-      overflow-x: hidden;
-      background-image: 
-        radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 30%),
-        radial-gradient(circle at 85% 30%, rgba(255, 107, 0, 0.1), transparent 30%);
-    }
-
-    /* شريط التنقل الزجاجي */
-    .navbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(5, 5, 5, 0.7);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--surface-border);
-    }
-    .nav-container {
-      max-width: 1200px; margin: 0 auto; padding: 15px 24px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .logo {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 24px; font-weight: 900; color: white; text-decoration: none;
-      letter-spacing: -1px;
-    }
-    .logo-icon {
-      width: 38px; height: 38px;
-      background: linear-gradient(135deg, var(--primary), #8b5cf6);
-      border-radius: 12px; display: grid; place-items: center;
-      font-size: 20px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-    }
-    .nav-actions { display: flex; gap: 12px; align-items: center; }
-    .btn-nav {
-      padding: 10px 20px; border-radius: 14px; font-weight: 700; font-size: 14px;
-      text-decoration: none; cursor: pointer; border: none; transition: all 0.3s ease;
-    }
-    .btn-glass { background: var(--surface); color: white; border: 1px solid var(--surface-border); }
-    .btn-glass:hover { background: rgba(255,255,255,0.1); }
-    .btn-primary {
-      background: white; color: black;
-      box-shadow: 0 0 20px rgba(255,255,255,0.2);
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255,255,255,0.4); }
-
-    /* القسم الرئيسي (Hero) */
-    .hero { max-width: 1200px; margin: 140px auto 60px; padding: 0 24px; text-align: center; }
-    .hero-badge {
-      display: inline-block; padding: 6px 16px; border-radius: 20px;
-      background: var(--surface); border: 1px solid var(--surface-border);
-      font-size: 13px; color: var(--primary); font-weight: 700; margin-bottom: 24px;
-    }
-    .hero h1 {
-      font-size: clamp(48px, 8vw, 90px); font-weight: 900; line-height: 1.1;
-      margin-bottom: 24px; letter-spacing: -2px;
-    }
-    .hero h1 span {
-      background: linear-gradient(to right, #fff, #888);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .hero p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto 40px; font-weight: 500; }
-
-    /* شبكة المنتجات */
-    .products-grid {
-      max-width: 1200px; margin: 0 auto; padding: 0 24px 100px;
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;
-    }
-    .product-card {
-      background: var(--surface); border: 1px solid var(--surface-border);
-      border-radius: 24px; overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative; display: flex; flex-direction: column;
-      backdrop-filter: blur(10px);
-    }
-    .product-card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.2); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-    .product-img-wrap { height: 220px; overflow: hidden; position: relative; }
-    .product-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-    .product-card:hover .product-img { transform: scale(1.05); }
-    .product-tag {
-      position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(10px); padding: 6px 14px; border-radius: 20px;
-      font-size: 12px; font-weight: 700; border: 1px solid rgba(255,255,255,0.1);
-    }
-    .product-info { padding: 24px; flex: 1; display: flex; flex-direction: column; }
-    .product-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
-    .product-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; flex: 1; line-height: 1.6; }
-    .product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-    .product-price { font-size: 24px; font-weight: 900; color: white; font-family: system-ui; }
-    .btn-buy {
-      background: linear-gradient(135deg, var(--accent), #e65100);
-      color: white; border: none; padding: 12px 24px; border-radius: 14px;
-      font-weight: 800; cursor: pointer; transition: all 0.3s;
-      box-shadow: 0 8px 20px var(--accent-glow);
-    }
-    .btn-buy:hover { transform: scale(1.05); box-shadow: 0 12px 25px var(--accent-glow); }
-
-    /* النوافذ المنبثقة (Modals) */
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 1000; display: none; place-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s; }
-    .modal.show { display: grid; opacity: 1; }
-    .modal-content {
-      background: #0a0a0a; border: 1px solid var(--surface-border);
-      border-radius: 28px; padding: 40px; width: 100%; max-width: 480px;
-      position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-      transform: translateY(20px); transition: transform 0.3s;
-    }
-    .modal.show .modal-content { transform: translateY(0); }
-    .close-btn { position: absolute; top: 24px; left: 24px; background: rgba(255,255,255,0.1); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; transition: 0.2s; }
-    .close-btn:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
-    .form-group { margin-bottom: 20px; }
-    .form-control { width: 100%; padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--surface-border); border-radius: 14px; color: white; font-family: var(--font); font-size: 15px; outline: none; transition: 0.3s; }
-    .form-control:focus { border-color: var(--primary); background: rgba(255,255,255,0.1); }
-    .btn-full { width: 100%; padding: 16px; border-radius: 14px; font-weight: 800; font-size: 16px; cursor: pointer; border: none; margin-top: 10px; transition: 0.3s; }
-    .google-btn { background: white; color: black; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; }
-    
-    /* زر الواتساب العائم */
-    .floating-wa {
-      position: fixed; bottom: 30px; left: 30px; background: #25D366;
-      color: white; width: 64px; height: 64px; border-radius: 50%;
-      display: grid; place-items: center; font-size: 32px;
-      box-shadow: 0 10px 25px rgba(37,211,102,0.4); z-index: 999; text-decoration: none;
-      transition: 0.3s;
-    }
-    .floating-wa:hover { transform: scale(1.1) rotate(10deg); }
-
-    @media (max-width: 768px) {
-      .hero h1 { font-size: 40px; }
-      .nav-actions .btn-glass { display: none; }
-      .products-grid { grid-template-columns: 1fr; }
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800;900&display=swap');
+    :root{--blue:#1264ff;--blue2:#0847c7;--navy:#0b1f4e;--ink:#18243a;--muted:#6f7f9a;--sky:#eef5ff;--line:#e4ebf5;--cyan:#22c9ff;--orange:#ff7a18;--green:#12a46f;--red:#e24f58;--shadow:0 22px 70px rgba(24,71,155,.12)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 8% 0,#dfeeff 0,transparent 26%),radial-gradient(circle at 95% 24%,#e9f8ff 0,transparent 23%),#f8fbff;color:var(--ink);font-family:Tajawal,Arial,sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}body:after{content:'';position:fixed;inset:auto auto -170px -160px;width:430px;height:430px;border-radius:50%;background:linear-gradient(135deg,#b8d6ff55,#22c9ff1c);filter:blur(3px);pointer-events:none;z-index:-1}a{text-decoration:none;color:inherit}button,input,textarea,select{font:inherit}button{border:0;cursor:pointer}.wrap{width:min(1240px,calc(100% - 34px));margin:auto}.topline{background:var(--navy);color:#dbe8ff;text-align:center;font-size:12px;padding:7px 15px}.topline b{color:#fff}.top{position:sticky;top:0;z-index:10;background:#ffffffdf;backdrop-filter:blur(20px);border-bottom:1px solid #e2ebf7}.nav{height:76px;display:flex;align-items:center;gap:28px}.brand{display:flex;align-items:center;gap:10px;min-width:max-content}.brand img{width:47px;height:47px}.brand strong{display:block;color:var(--navy);font-size:23px;line-height:1.05;letter-spacing:-.5px}.brand small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.nav-links{display:flex;align-items:center;gap:26px;color:#637493;font-weight:700;font-size:14px;margin-right:auto}.nav-links a{transition:.2s}.nav-links a:hover{color:var(--blue)}.nav-actions{display:flex;gap:9px;align-items:center}.ghost,.account,.admin-link,.primary,.outline{border-radius:14px;padding:11px 15px;font-weight:800;font-size:13px;transition:.22s}.ghost{background:#f1f6ff;color:var(--blue);border:1px solid #dce8ff}.orders-btn{background:#eef5ff;color:var(--blue);border:1px solid #d9e6ff;border-radius:14px;padding:10px 13px;font-weight:900;font-size:12px}.account{background:#fff;border:1px solid var(--line);color:var(--navy);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.admin-link{background:var(--navy);color:#fff}.ghost:hover,.account:hover,.admin-link:hover,.primary:hover,.outline:hover{transform:translateY(-2px)}.hero{min-height:560px;display:grid;grid-template-columns:1.02fr .98fr;gap:48px;align-items:center;padding:74px 0 52px;position:relative}.hero-copy{position:relative;z-index:1}.eyebrow{display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid #dce8fb;border-radius:999px;padding:8px 13px;color:var(--blue);font-weight:800;font-size:12px;box-shadow:0 9px 25px #174da610}.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 5px #22c9ff22}.hero h1{font-size:clamp(40px,5.3vw,75px);line-height:1.08;letter-spacing:-2px;margin:20px 0 17px;color:var(--navy);text-shadow:0 4px 0 #dce8ff,0 15px 28px #164a9b18}.hero h1 span{display:inline-block;color:var(--blue);background:linear-gradient(135deg,var(--blue),#08a8e8);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}.hero p{max-width:590px;color:var(--muted);font-size:18px;font-weight:600;line-height:2;margin:0 0 26px}.hero-actions{display:flex;gap:10px;flex-wrap:wrap}.primary{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--orange),#ec4f00);color:#fff;box-shadow:0 13px 25px #ff6b0038}.outline{background:#fff;color:var(--blue);border:1px solid #d8e5fa}.hero-trust{display:flex;gap:18px;align-items:center;margin-top:28px;color:var(--muted);font-size:12px;font-weight:700}.trust-icons{display:flex;direction:ltr}.trust-icons i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#9ac6ff,#1264ff);color:#fff;border:3px solid #f8fbff;margin-left:-8px;font-style:normal;font-size:11px}.hero-visual{position:relative;min-height:420px;perspective:1000px}.orb{position:absolute;border-radius:50%;filter:blur(.2px);pointer-events:none}.orb-a{width:310px;height:310px;right:42px;top:22px;background:radial-gradient(circle at 32% 28%,#fff,#b9d8ff 45%,#1264ff);box-shadow:0 35px 80px #1264ff3a}.orb-b{width:150px;height:150px;left:26px;bottom:24px;background:linear-gradient(145deg,#fff,#d8f7ff);box-shadow:0 22px 45px #20bfe83b}.command-card{position:absolute;inset:70px 22px 38px 40px;border-radius:30px;background:linear-gradient(145deg,#0b2460,#1264ff 62%,#26c9ff);padding:25px;color:#fff;box-shadow:0 38px 80px #082a7542,inset 0 1px 0 #ffffff66;transform:rotateY(-9deg) rotateX(4deg);overflow:hidden}.command-card:before{content:'';position:absolute;width:320px;height:320px;border:1px solid #ffffff3b;border-radius:50%;left:-130px;bottom:-180px;box-shadow:0 0 0 30px #ffffff0b,0 0 0 60px #ffffff07}.command-card:after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,#ffffff12 36%,transparent 48%);pointer-events:none}.command-top{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}.command-top span{font-size:12px;color:#c8dcff}.signal{display:flex;gap:4px;align-items:flex-end}.signal i{width:4px;background:#9cecff;border-radius:4px}.signal i:nth-child(1){height:8px}.signal i:nth-child(2){height:14px}.signal i:nth-child(3){height:20px}.command-card h2{font-size:26px;margin:42px 0 7px;position:relative;z-index:1}.command-card p{color:#d4e6ff;font-size:13px;margin:0;position:relative;z-index:1}.charge-box{display:flex;align-items:center;gap:8px;background:#ffffff18;border:1px solid #ffffff32;border-radius:15px;padding:10px;margin-top:25px;position:relative;z-index:1}.charge-box span{font-size:11px;color:#d8e7ff;white-space:nowrap}.charge-line{height:8px;background:#ffffff28;border-radius:99px;overflow:hidden;flex:1}.charge-line i{display:block;width:72%;height:100%;background:linear-gradient(90deg,#fff,#79e7ff);border-radius:99px}.floating{position:absolute;z-index:3;background:#fff;color:var(--navy);border-radius:17px;padding:12px 14px;box-shadow:0 18px 35px #0b30752b;font-size:11px;font-weight:800}.floating b{display:block;color:var(--blue);font-size:15px;margin-top:2px}.float-a{right:-9px;top:38px}.float-b{left:0;bottom:49px;color:#147d62}.float-b b{color:#147d62}.section{padding:38px 0}.section-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:20px}.kicker{color:var(--blue);font-size:12px;font-weight:900;letter-spacing:.3px}.section h2{font-size:30px;line-height:1.2;color:var(--navy);margin:6px 0}.section-head p{color:var(--muted);font-size:14px;margin:8px 0 0}.text-link{color:var(--blue);font-size:13px;font-weight:800}.categories{display:grid;grid-template-columns:repeat(6,1fr);gap:11px}.category{display:flex;align-items:center;gap:10px;text-align:right;background:#fff;border:1px solid var(--line);border-radius:19px;padding:15px 12px;color:var(--navy);box-shadow:0 9px 24px #183d7808;transition:.25s}.category:hover,.category.active{transform:translateY(-4px);border-color:#a9c8ff;box-shadow:0 16px 30px #184f9c18}.category.active{background:linear-gradient(135deg,#eef5ff,#fff);outline:2px solid #d7e7ff}.category-icon{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#edf5ff,#d9ecff);color:var(--blue);font-size:21px;flex:0 0 40px}.category strong{display:block;font-size:12px}.category small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.catalog-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 15px}.search{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:0 13px;width:min(370px,100%);box-shadow:0 8px 24px #183d7808}.search svg{width:19px;color:var(--blue);flex:0 0 auto}.search input{width:100%;border:0;outline:0;padding:13px 0;color:var(--ink);background:transparent}.filter-pills{display:flex;gap:7px;overflow:auto}.pill{background:#fff;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-size:12px;font-weight:800;white-space:nowrap}.pill.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 8px 17px #1264ff34}.products{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.product{background:#fff;border:1px solid var(--line);border-radius:24px;padding:9px;box-shadow:0 13px 32px #153c790d;transition:.3s;position:relative;overflow:hidden}.product:hover{transform:translateY(-8px) rotateX(2deg);box-shadow:0 25px 46px #153c7923}.product-media{height:168px;border-radius:18px;background:linear-gradient(145deg,#edf5ff,#d6e9ff);position:relative;display:grid;place-items:center;overflow:hidden}.product-media:after{content:'';position:absolute;width:150px;height:150px;border:18px solid #ffffff44;border-radius:50%;right:-50px;bottom:-70px}.product-media img{width:100%;height:100%;object-fit:cover}.art{width:95px;height:95px;border-radius:28px;display:grid;place-items:center;background:linear-gradient(145deg,#fff,#b9dcff);box-shadow:0 18px 30px #1264ff30;transform:rotate(-8deg);font-size:45px}.badge{position:absolute;top:11px;right:11px;background:#fff;color:var(--blue);border-radius:999px;padding:5px 9px;font-size:10px;font-weight:900;z-index:1}.fav{position:absolute;top:10px;left:10px;width:30px;height:30px;border-radius:50%;background:#ffffffcc;color:var(--blue);font-size:17px;z-index:2}.product-body{padding:13px 6px 4px}.product-cat{color:var(--blue);font-size:10px;font-weight:900}.product h3{font-size:16px;margin:4px 0;color:var(--navy);line-height:1.4}.product p{font-size:11px;color:var(--muted);min-height:37px;margin:0}.product-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #edf1f6;padding-top:11px;margin-top:11px}.price{font-weight:900;color:var(--navy);font-size:16px;direction:ltr;display:inline-block}.currency{color:var(--muted);font-size:9px;margin-right:3px}.buy{background:linear-gradient(135deg,var(--orange),#e95100);color:#fff;border-radius:11px;padding:9px 11px;font-size:11px;font-weight:900;white-space:nowrap}.buy:hover{box-shadow:0 8px 17px #ff6b0040}.how{margin:47px 0;border-radius:30px;background:linear-gradient(135deg,#0b2460,#1264ff);color:#fff;padding:30px;box-shadow:0 28px 60px #123f9230;position:relative;overflow:hidden}.how:after{content:'';position:absolute;inset:-140px -80px auto auto;width:390px;height:390px;border:1px solid #ffffff3a;border-radius:50%;box-shadow:0 0 0 30px #ffffff09,0 0 0 60px #ffffff07}.how h2{margin:0;color:#fff;font-size:27px;position:relative;z-index:1}.how p{color:#c9dcff;font-size:13px;position:relative;z-index:1}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative;z-index:1;margin-top:23px}.step{display:flex;align-items:flex-start;gap:11px;background:#ffffff12;border:1px solid #ffffff20;border-radius:16px;padding:14px}.step i{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;background:#fff;color:var(--blue);font-style:normal;font-weight:900;flex:0 0 auto}.step strong{display:block;font-size:13px}.step small{display:block;color:#c2d6ff;font-size:10px;margin-top:3px}.trust-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 0 44px}.trust-item{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:17px;padding:13px;box-shadow:0 8px 22px #183d7807}.trust-item i{width:37px;height:37px;display:grid;place-items:center;border-radius:12px;background:#edf5ff;color:var(--blue);font-style:normal;font-size:18px}.trust-item strong{display:block;color:var(--navy);font-size:12px}.trust-item small{display:block;color:var(--muted);font-size:10px}.footer{background:var(--navy);color:#dbe7ff;padding:30px 0}.footer-main{display:flex;justify-content:space-between;gap:30px}.footer .brand strong{color:#fff}.footer .brand small{color:#9db8ea}.footer p{max-width:390px;color:#a9bde5;font-size:12px}.footer-links{display:flex;gap:45px}.footer-links div{display:grid;gap:7px;color:#c6d6f2;font-size:12px}.footer-links a:hover{color:#fff}.footer-bottom{border-top:1px solid #ffffff18;padding-top:16px;margin-top:23px;color:#9db3db;font-size:11px;display:flex;justify-content:space-between}.modal{position:fixed;inset:0;background:#06183bb3;backdrop-filter:blur(9px);z-index:30;display:none;place-items:center;padding:18px}.modal.show{display:grid}.modal-card{width:min(500px,100%);max-height:91vh;overflow:auto;background:#fff;border-radius:26px;padding:22px;box-shadow:0 35px 90px #06183b4d;position:relative}.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}.modal-head h2{margin:0;color:var(--navy);font-size:22px}.close{width:34px;height:34px;border-radius:10px;background:#f0f5ff;color:var(--navy);font-size:23px}.modal-desc{color:var(--muted);font-size:12px;margin:0 0 17px}.field{margin:11px 0}.field label{display:block;font-size:11px;color:var(--navy);font-weight:800;margin-bottom:5px}.field input,.field textarea{width:100%;background:#fbfdff;border:1px solid #dce6f3;border-radius:12px;padding:11px;outline:0;color:var(--ink)}.field input:focus,.field textarea:focus{border-color:#80abff;box-shadow:0 0 0 4px #1264ff12}.field textarea{min-height:78px;resize:vertical}.full{width:100%;margin-top:8px}.tabs{display:flex;gap:7px;background:#f2f6fc;border-radius:13px;padding:4px;margin:15px 0}.tab{flex:1;background:transparent;color:var(--muted);padding:9px;border-radius:10px;font-weight:800;font-size:12px}.tab.active{background:#fff;color:var(--blue);box-shadow:0 4px 12px #183d7814}.auth-view{display:none}.auth-view.active{display:block}.google{width:100%;border:1px solid #dce6f3;background:#fff;border-radius:12px;padding:11px;color:#263c63;font-weight:900}.message{display:none;padding:10px;border-radius:11px;background:#fff1f1;color:var(--red);font-size:12px;margin-top:10px}.message.show{display:block}.success{background:#eafff5;color:var(--green)}.order-list{display:grid;gap:9px}.order-row{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fbfdff}.order-row strong{display:block;color:var(--navy);font-size:12px}.order-row small{display:block;color:var(--muted);font-size:10px}.codes{color:var(--green);background:#effcf6;border-radius:9px;padding:7px;margin-top:8px;font-size:12px;direction:ltr;text-align:left}.toast{position:fixed;left:18px;bottom:18px;background:var(--navy);color:#fff;border-radius:13px;padding:12px 15px;z-index:50;transform:translateY(100px);transition:.25s;box-shadow:0 14px 30px #06183b45;font-size:12px}.toast.show{transform:translateY(0)}.empty{grid-column:1/-1;text-align:center;padding:30px;background:#fff;border:1px dashed #cbdaf0;border-radius:18px;color:var(--muted)}
+    @media(max-width:1000px){.nav-links{gap:14px}.hero{gap:25px}.products{grid-template-columns:repeat(3,1fr)}.categories{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:720px){.wrap{width:min(100% - 24px,560px)}.topline{font-size:10px}.nav{height:65px;gap:9px}.brand img{width:40px;height:40px}.brand strong{font-size:18px}.brand small{font-size:8px}.nav-links{display:none}.nav-actions{margin-right:auto}.admin-link{font-size:0;padding:10px;width:39px;height:39px}.admin-link:after{content:'⚙';font-size:16px}.account{font-size:11px;padding:9px 10px;max-width:90px}.ghost{font-size:0;padding:10px;width:40px;height:40px}.ghost:after{content:'⌕';font-size:19px}.hero{display:block;min-height:auto;padding:39px 0 27px}.hero h1{font-size:42px;letter-spacing:-1px}.hero p{font-size:15px;line-height:1.9}.hero-visual{min-height:315px;margin-top:30px}.command-card{inset:38px 12px 25px 25px}.command-card h2{font-size:21px;margin-top:32px}.orb-a{width:235px;height:235px;right:28px}.orb-b{width:105px;height:105px;left:0}.float-a{right:-4px;top:16px}.float-b{left:-1px;bottom:19px}.section{padding:26px 0}.section-head{align-items:flex-start;flex-direction:column;gap:7px}.section h2{font-size:25px}.categories{display:flex;overflow:auto;padding:2px 0 9px}.category{min-width:150px}.catalog-bar{display:block}.search{width:100%;margin-bottom:10px}.filter-pills{padding-bottom:4px}.products{grid-template-columns:repeat(2,1fr);gap:10px}.product{padding:7px;border-radius:19px}.product-media{height:130px;border-radius:14px}.art{width:70px;height:70px;font-size:34px;border-radius:22px}.product-body{padding:10px 4px 3px}.product h3{font-size:13px}.product p{font-size:10px;min-height:34px}.price{font-size:13px}.buy{font-size:10px;padding:8px 7px}.how{padding:22px 17px;margin:28px 0;border-radius:22px}.how h2{font-size:22px}.steps{grid-template-columns:1fr;gap:8px}.trust-strip{grid-template-columns:repeat(2,1fr);gap:8px;padding-bottom:30px}.trust-item{padding:10px}.trust-item strong{font-size:10px}.trust-item small{font-size:8px}.footer-main{display:block}.footer-links{margin-top:20px;gap:34px}.footer-bottom{display:block;line-height:2}.modal{padding:11px}.modal-card{padding:17px;border-radius:22px}}
+    @media(max-width:380px){.products{grid-template-columns:1fr}.product-media{height:180px}}
   </style>
 </head>
 <body>
-
-  <!-- شريط التنقل -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="#" class="logo">
-        <div class="logo-icon">M</div> MARO
-      </a>
-      <div class="nav-actions">
-        <a href="admin.html" class="btn-nav btn-glass">الإدارة</a>
-        <button class="btn-nav btn-primary" id="userBtn">تسجيل الدخول</button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- القسم الرئيسي -->
-  <section class="hero">
-    <div class="hero-badge">✨ منصة رقمية من الجيل القادم</div>
-    <h1>تسوّق بذكاء، <br><span>وادفع بأمان.</span></h1>
-    <p>أفضل الاشتراكات الرقمية، شحن الألعاب، والبطاقات الإلكترونية بأسعار تنافسية وتسليم فوري.</p>
-  </section>
-
-  <!-- المنتجات -->
-  <div class="products-grid" id="productsGrid"></div>
-
-  <!-- زر الواتساب -->
-  <a href="https://wa.me/962795230369" target="_blank" class="floating-wa">💬</a>
-
-  <!-- نافذة تسجيل الدخول -->
-  <div class="modal" id="authModal">
-    <div class="modal-content">
-      <button class="close-btn" onclick="closeModal('authModal')">×</button>
-      <h2 style="text-align:center; margin-bottom:30px; font-weight:900; font-size:28px;">مرحباً بك مجدداً</h2>
-      <button class="btn-full google-btn" id="googleLoginBtn">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="22"> الدخول بحساب جوجل
-      </button>
-      <div style="text-align:center; margin:20px 0; color:var(--text-muted); font-weight:600;">أو بالبريد الإلكتروني</div>
-      <form id="loginForm">
-        <div class="form-group"><input type="email" id="loginEmail" class="form-control" placeholder="البريد الإلكتروني" required></div>
-        <div class="form-group"><input type="password" id="loginPassword" class="form-control" placeholder="كلمة المرور" required></div>
-        <button type="submit" class="btn-full btn-primary" style="background:var(--primary); color:white; box-shadow:0 4px 15px rgba(59,130,246,0.4);">دخول</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- نافذة إتمام الطلب -->
-  <div class="modal" id="checkoutModal">
-    <div class="modal-content" id="checkoutContent">
-      <button class="close-btn" onclick="closeModal('checkoutModal')">×</button>
-      <h2 style="margin-bottom:24px; font-weight:900; font-size:26px;">إتمام الطلب</h2>
-      <div id="orderSummary" style="background:rgba(255,255,255,0.03); padding:20px; border-radius:16px; margin-bottom:24px; border:1px solid var(--surface-border);"></div>
-      <form id="checkoutForm">
-        <div class="form-group"><input type="text" id="custName" class="form-control" placeholder="الاسم الكامل" required></div>
-        <div class="form-group"><input type="tel" id="custPhone" class="form-control" placeholder="رقم الهاتف / واتساب" required></div>
-        <button type="submit" class="btn-full" style="background:#10b981; color:white; box-shadow:0 8px 20px rgba(16,185,129,0.3);">تأكيد الطلب والدفع</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Firebase -->
+  <div class="topline"><b>متجر مارو</b> — شحن أسرع، اختيارات أوضح، وخدمات رقمية في مكان واحد</div>
+  <header class="top"><nav class="wrap nav"><a class="brand" href="#home"><img src="/maro-logo.svg" alt="شعار متجر مارو"><span><strong>متجر مارو</strong><small>شحن ألعاب وخدمات رقمية</small></span></a><nav class="nav-links"><a href="#home">الرئيسية</a><a href="#categories">التصنيفات</a><a href="#products">المنتجات</a><a href="#how">كيف نعمل؟</a></nav><div class="nav-actions"><a class="ghost" href="#products" aria-label="البحث">بحث</a><a class="admin-link" href="admin.html">لوحة الإدارة</a><button class="orders-btn" id="ordersBtn" type="button" hidden>طلباتي</button><button class="account" id="accountBtn" type="button">تسجيل الدخول</button></div></nav></header>
+  <main id="home">
+    <section class="wrap hero"><div class="hero-copy"><span class="eyebrow"><i></i> منصة مارو الرقمية جاهزة لخدمتك</span><h1>اشحن، اشترِ،<br><span>وكمل يومك.</span></h1><p>من شدات الألعاب والبطاقات الرقمية إلى الاشتراكات والخدمات الإلكترونية — تجربة شراء سريعة وواضحة وآمنة.</p><div class="hero-actions"><a class="primary" href="#products">اكتشف المنتجات <b>←</b></a><a class="outline" href="#how">كيف يتم التسليم؟</a></div><div class="hero-trust"><span class="trust-icons"><i>م</i><i>ر</i><i>و</i><i>+</i></span><span>اختيارات رقمية تصل لك بعد تأكيد الدفع</span></div></div><div class="hero-visual"><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="command-card"><div class="command-top"><span>MARO DIGITAL HUB</span><span class="signal"><i></i><i></i><i></i></span></div><h2>شحنك يبدأ من هنا</h2><p>ألعاب، بطاقات، اشتراكات وخدمات — بدون لف ودوران.</p><div class="charge-box"><span>جاهزية الخدمة</span><div class="charge-line"><i></i></div><span>72%</span></div></div><div class="floating float-a">طلبات اليوم<b>سريعة وواضحة</b></div><div class="floating float-b">● دفع آمن<b>PayPal + Firebase</b></div></div></section>
+    <section class="wrap section" id="categories"><div class="section-head"><div><div class="kicker">تصفح بطريقتك</div><h2>ماذا تريد اليوم؟</h2><p>اختر الفئة، وشاهد الخدمات والمنتجات المتاحة فوراً.</p></div><a class="text-link" href="#products">كل المنتجات ←</a></div><div class="categories" id="categoriesList"></div></section>
+    <section class="wrap section" id="products"><div class="section-head"><div><div class="kicker">مارو يختصر الطريق</div><h2>عروض رقمية مختارة</h2><p>أسعار واضحة، شراء مباشر، وتسليم الكود بعد الدفع.</p></div></div><div class="catalog-bar"><label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="searchInput" placeholder="ابحث عن لعبة، بطاقة أو اشتراك..." autocomplete="off"></label><div class="filter-pills"><button class="pill active" data-filter="الكل">الكل</button><button class="pill" data-filter="ألعاب">ألعاب</button><button class="pill" data-filter="بطاقات رقمية">بطاقات رقمية</button><button class="pill" data-filter="اشتراكات">اشتراكات</button><button class="pill" data-filter="إنترنت">إنترنت</button></div></div><div class="products" id="productsList"></div></section>
+    <section class="wrap how" id="how"><div class="kicker" style="color:#8fe8ff">تجربة بسيطة من ثلاث خطوات</div><h2>من الاختيار إلى التسليم، كل شيء واضح.</h2><p>لا تحتاج إلى مراسلات طويلة. اختر المنتج، سجّل دخولك، وادفع من خلال PayPal.</p><div class="steps"><div class="step"><i>01</i><span><strong>اختر الخدمة</strong><small>ابحث أو استخدم التصنيفات للوصول بسرعة.</small></span></div><div class="step"><i>02</i><span><strong>أكمل الدفع</strong><small>نحسب السعر من الخادم ونفتح PayPal بأمان.</small></span></div><div class="step"><i>03</i><span><strong>استلم الكود</strong><small>يظهر داخل طلباتك بعد تأكيد العملية.</small></span></div></div></section>
+    <section class="wrap trust-strip"><div class="trust-item"><i>⚡</i><span><strong>تسليم سريع</strong><small>بعد تأكيد الدفع</small></span></div><div class="trust-item"><i>◇</i><span><strong>بيانات محمية</strong><small>Firebase + HTTPS</small></span></div><div class="trust-item"><i>✓</i><span><strong>أسعار من الخادم</strong><small>بدون تلاعب بالمتصفح</small></span></div><div class="trust-item"><i>⌁</i><span><strong>دعم واضح</strong><small>تاريخ طلباتك محفوظ</small></span></div></section>
+  </main>
+  <footer class="footer"><div class="wrap"><div class="footer-main"><div><a class="brand" href="#home"><img src="/maro-logo.svg" alt="شعار مارو"><span><strong>متجر مارو</strong><small>شحن ألعاب وخدمات رقمية</small></span></a><p>منصة رقمية عربية تجمع كل ما تحتاجه من شحن الألعاب والبطاقات والاشتراكات والخدمات الإلكترونية في تجربة واحدة.</p></div><div class="footer-links"><div><a href="#products">المنتجات</a><a href="#categories">التصنيفات</a><a href="#how">طريقة الشراء</a></div><div><a href="privacy.html">الخصوصية</a><a href="terms.html">الشروط والاستبدال</a><a href="admin.html">دخول الإدارة</a></div></div></div><div class="footer-bottom"><span>© <span id="year"></span> متجر مارو. جميع الحقوق محفوظة.</span><span>مصمم ليعمل بسرعة على الهاتف وRender.</span></div></div></footer>
+  <div class="modal" id="authModal"><div class="modal-card"><div class="modal-head"><h2>حسابك في مارو</h2><button class="close" id="closeAuth">×</button></div><p class="modal-desc">سجّل الدخول لتتابع طلباتك وتستلم أكوادك بأمان.</p><button class="google" id="googleBtn" type="button">G &nbsp; تسجيل الدخول بواسطة Google</button><div class="tabs"><button class="tab active" data-view="loginView">دخول</button><button class="tab" data-view="signupView">حساب جديد</button></div><div class="auth-view active" id="loginView"><form id="loginForm"><div class="field"><label>البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="email" required></div><div class="field"><label>كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" required></div><button class="primary full" type="submit">تسجيل الدخول</button></form></div><div class="auth-view" id="signupView"><form id="signupForm"><div class="field"><label>الاسم</label><input id="signupName" autocomplete="name" required placeholder="مثال: محمد أحمد"></div><div class="field"><label>البريد الإلكتروني</label><input id="signupEmail" type="email" autocomplete="email" required></div><div class="field"><label>كلمة المرور</label><input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required></div><button class="primary full" type="submit">إنشاء الحساب</button></form></div><div class="message" id="authMessage"></div></div></div>
+  <div class="modal" id="checkoutModal"><div class="modal-card"><div class="modal-head"><h2>تأكيد الشراء</h2><button class="close" id="closeCheckout">×</button></div><p class="modal-desc" id="checkoutProduct"></p><div class="message" id="checkoutMessage"></div><form id="checkoutForm"><div class="field"><label>الاسم الكامل</label><input name="name" id="customerName" autocomplete="name" required placeholder="مثال: أحمد محمد"></div><div class="field"><label>رقم الهاتف أو واتساب <small style="color:var(--muted)">(اختياري)</small></label><input name="phone" inputmode="tel" autocomplete="tel" placeholder="07xxxxxxxx"></div><div class="field"><label>ملاحظات <small style="color:var(--muted)">(اختياري)</small></label><textarea name="note" placeholder="أي تفاصيل تساعد في تجهيز الطلب"></textarea></div><button class="primary full" type="submit">المتابعة إلى PayPal <b>←</b></button></form></div></div>
+  <div class="modal" id="ordersModal"><div class="modal-card"><div class="modal-head"><h2>طلباتي</h2><button class="close" id="closeOrders">×</button></div><p class="modal-desc">تابع حالة الطلب والأكواد التي تم تسليمها إلى حسابك.</p><div class="order-list" id="ordersList"><p>جارٍ التحميل...</p></div></div></div>
+  <div class="toast" id="toast"></div>
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-    
+    import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,updateProfile,signInWithPopup,signInWithRedirect,getRedirectResult,GoogleAuthProvider,signOut} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
     const firebaseConfig={apiKey:'AIzaSyAZucoNuZyKDoxfS7tboc3-ZttqONuw_vw',authDomain:'maro-store-4dc09.firebaseapp.com',projectId:'maro-store-4dc09',storageBucket:'maro-store-4dc09.firebasestorage.app',messagingSenderId:'55163169834',appId:'1:55163169834:web:48ba5eda57e23c41886753',measurementId:'G-FZWPNG5XD3'};
-    const auth = getAuth(initializeApp(firebaseConfig)); const provider = new GoogleAuthProvider();
-    
-    window.novaGetToken = async () => auth.currentUser ? auth.currentUser.getIdToken() : null;
-    
-    onAuthStateChanged(auth, user => {
-      const btn = document.getElementById('userBtn');
-      if(user) { btn.textContent = 'حسابي'; btn.onclick = () => { signOut(auth); alert('تم تسجيل الخروج'); }; }
-      else { btn.textContent = 'تسجيل الدخول'; btn.onclick = () => document.getElementById('authModal').classList.add('show'); }
-    });
-
-    document.getElementById('googleLoginBtn').onclick = async () => { try { await signInWithPopup(auth, provider); closeModal('authModal'); } catch(e) { alert('فشل الدخول'); } };
-    document.getElementById('loginForm').onsubmit = async (e) => { e.preventDefault(); try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); closeModal('authModal'); } catch(e) { alert('بيانات خاطئة'); } };
-    window.closeModal = id => document.getElementById(id).classList.remove('show');
-  </script>
-
-  <!-- Logic -->
-  <script>
-    const $ = s => document.querySelector(s);
-    const money = n => '$' + Number(n).toFixed(2);
-    let products = [], currentCart = null;
-
-    async function loadData() {
-      try {
-        const res = await fetch('/api/products');
-        products = await res.json();
-        document.getElementById('productsGrid').innerHTML = products.map(p => `
-          <article class="product-card">
-            <div class="product-img-wrap">
-              <img src="${p.image || 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?q=80&w=600'}" class="product-img" alt="${p.name}">
-              <span class="product-tag">${p.category}</span>
-            </div>
-            <div class="product-info">
-              <h3 class="product-title">${p.name}</h3>
-              <p class="product-desc">${p.description}</p>
-              <div class="product-footer">
-                <span class="product-price">${money(p.price)}</span>
-                <button class="btn-buy" onclick="buyNow('${p.id}')">شراء الآن</button>
-              </div>
-            </div>
-          </article>
-        `).join('');
-      } catch(e) {
-        // بيانات تجريبية إذا فشل الاتصال
-        document.getElementById('productsGrid').innerHTML = `
-          <article class="product-card">
-            <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=600&q=80" class="product-img"></div>
-            <div class="product-info">
-              <h3 class="product-title">Netflix Premium</h3>
-              <p class="product-desc">شهر كامل بجودة 4K فائقة.</p>
-              <div class="product-footer"><span class="product-price">$4.50</span><button class="btn-buy">شراء</button></div>
-            </div>
-          </article>
-        `;
-      }
-    }
-
-    window.buyNow = (id) => {
-      currentCart = products.find(p => p.id === id);
-      if(!currentCart) return;
-      $('#orderSummary').innerHTML = `<div style="display:flex; justify-content:space-between; font-size:18px;"><span>${currentCart.name}</span><b style="color:var(--primary);">${money(currentCart.price)}</b></div>`;
-      $('#checkoutModal').classList.add('show');
-    };
-
-    $('#checkoutForm').onsubmit = async (e) => {
-      e.preventDefault();
-      const token = await window.novaGetToken();
-      if(!token) { closeModal('checkoutModal'); return alert('يجب تسجيل الدخول أولاً'); }
-      const name = $('#custName').value, phone = $('#custPhone').value;
-      const r = await fetch('/api/orders', { method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify({ items: [{id: currentCart.id, qty: 1}], customerName: name, phone }) });
-      const order = await r.json();
-      const waUrl = `https://wa.me/962795230369?text=${encodeURIComponent(`مرحباً، طلبي رقم ${order.id}\nالاسم: ${name}\nالمبلغ: ${money(order.total)}`)}`;
-      $('#checkoutContent').innerHTML = `
-        <div style="text-align:center;">
-          <div style="width:80px;height:80px;background:rgba(16,185,129,0.1);color:#10b981;font-size:40px;border-radius:50%;display:grid;place-items:center;margin:0 auto 20px;">✓</div>
-          <h2 style="color:white;margin-bottom:10px;">تم تسجيل طلبك</h2>
-          <p style="color:var(--text-muted); margin-bottom:20px;">حول المبلغ إلى محفظة زين كاش:</p>
-          <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; font-size:22px; font-weight:900; color:var(--primary); margin-bottom:20px;">0795230369</div>
-          <a href="${waUrl}" target="_blank" class="btn-full" style="background:#25D366; color:white; display:block; text-decoration:none; padding:16px; border-radius:14px; font-weight:800;">إرسال الإشعار عبر واتساب</a>
-        </div>`;
-    };
-    loadData();
+    const auth=getAuth(initializeApp(firebaseConfig)),provider=new GoogleAuthProvider(),$=s=>document.querySelector(s);let products=[],activeCategory='الكل',activeFilter='الكل',selectedProduct=null;
+    const seed=[{id:'p1',name:'شحن PUBG Mobile',category:'ألعاب',price:2.99,description:'شحن شدات سريع وآمن لحسابك.',tag:'الأكثر طلباً',image:'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=85'},{id:'p2',name:'اشتراك Netflix Premium',category:'اشتراكات',price:4.5,description:'اشتراك شهر كامل بجودة 4K.',tag:'عرض خاص',image:'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=900&q=85'},{id:'p3',name:'بطاقة Steam Wallet',category:'بطاقات رقمية',price:5,description:'بطاقة رقمية للألعاب والمحتوى.',tag:'جديد',image:'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=85'},{id:'p4',name:'بطاقة iTunes',category:'بطاقات رقمية',price:10,description:'للتطبيقات والألعاب والمحتوى.',tag:'الأكثر مبيعاً',image:'https://images.unsplash.com/photo-1607260554167-5f6b5e49f5f3?auto=format&fit=crop&w=900&q=85'},{id:'p5',name:'باقة إنترنت شهرية',category:'إنترنت',price:8,description:'إنترنت سريع بدون تعقيد.',tag:'قيمة ممتازة',image:'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=900&q=85'},{id:'p6',name:'Spotify Premium',category:'اشتراكات',price:3.5,description:'موسيقى بلا إعلانات لمدة شهر.',tag:'مميز',image:'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?auto=format&fit=crop&w=900&q=85'}];
+    const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const money=n=>'$'+Number(n||0).toFixed(2);const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2800)};const msg=(e,c)=>({'auth/invalid-credential':'البريد أو كلمة المرور غير صحيحة.','auth/email-already-in-use':'هذا البريد مستخدم مسبقاً.','auth/weak-password':'كلمة المرور يجب أن تكون 6 أحرف على الأقل.','auth/invalid-email':'صيغة البريد الإلكتروني غير صحيحة.','auth/too-many-requests':'محاولات كثيرة، حاول لاحقاً.','auth/operation-not-allowed':'تسجيل Google غير مفعّل في Firebase.','auth/unauthorized-domain':'أضف نطاق الموقع إلى Authorized domains في Firebase.'}[c]||e||'تعذر تنفيذ العملية.');
+    async function api(url,options={}){const r=await fetch(url,{headers:{'Content-Type':'application/json',...(options.headers||{})},...options});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'حدث خطأ في الاتصال.');return d}
+    function icon(cat){return cat==='ألعاب'?'🎮':cat==='بطاقات رقمية'?'▣':cat==='اشتراكات'?'◉':cat==='إنترنت'?'⌁':'✦'}
+    function renderCategories(){const cats=['الكل',...new Set(products.map(p=>p.category).filter(Boolean))];$('#categoriesList').innerHTML=cats.slice(0,8).map((c,i)=>`<button class="category ${activeCategory===c?'active':''}" data-cat="${esc(c)}"><span class="category-icon">${i?icon(c):'✦'}</span><span><strong>${esc(c)}</strong><small>${c==='الكل'?products.length:products.filter(p=>p.category===c).length} اختيارات</small></span></button>`).join('')}
+    function renderProducts(){const q=$('#searchInput').value.trim().toLowerCase();const list=products.filter(p=>(activeCategory==='الكل'||p.category===activeCategory)&&(activeFilter==='الكل'||p.category===activeFilter)&&(!q||`${p.name} ${p.description} ${p.category}`.toLowerCase().includes(q)));$('#productsList').innerHTML=list.length?list.map(p=>`<article class="product"><div class="product-media">${p.image?`<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'">`:`<div class="art">${icon(p.category)}</div>`}<span class="badge">${esc(p.tag||p.category)}</span><button class="fav" type="button" aria-label="مفضلة">♡</button></div><div class="product-body"><span class="product-cat">${esc(p.category)}</span><h3>${esc(p.name)}</h3><p>${esc(p.description||'خدمة رقمية سريعة من متجر مارو.')}</p><div class="product-foot"><span class="price">${money(p.price)} <small class="currency">USD</small></span><button class="buy" type="button" data-buy="${esc(p.id)}">شراء مباشر</button></div></div></article>`).join(''):'<div class="empty">لا توجد منتجات مطابقة حالياً. جرّب تصنيفاً أو كلمة أخرى.</div>'}
+    function render(){renderCategories();renderProducts()}
+    async function load(){try{const d=await api('/api/products');products=Array.isArray(d)&&d.length?d:seed}catch{products=seed;toast('نعرض المنتجات التجريبية مؤقتاً؛ تحقق من اتصال الخادم.')}render()}
+    function openModal(id){$(id).classList.add('show')}function closeModal(id){$(id).classList.remove('show')}
+    function buy(id){selectedProduct=products.find(p=>p.id===id);if(!selectedProduct)return;if(!auth.currentUser){openModal('#authModal');toast('سجّل الدخول أولاً لإكمال الشراء');return}$('#checkoutProduct').textContent=`${selectedProduct.name} · ${money(selectedProduct.price)} USD`;$('#customerName').value=auth.currentUser.displayName||'';openModal('#checkoutModal')}
+    window.novaGetToken=async()=>auth.currentUser?auth.currentUser.getIdToken():null;
+    async function loadOrders(){const box=$('#ordersList');const token=await window.novaGetToken();if(!token){box.innerHTML='<p>سجّل الدخول أولاً.</p>';return}box.innerHTML='<p>جارٍ تحميل طلباتك...</p>';try{const rows=await api('/api/my-orders',{headers:{Authorization:`Bearer ${token}`}});box.innerHTML=rows.length?rows.map(o=>`<div class="order-row"><strong>${esc(o.id)} · ${esc(o.status)}</strong><small>${esc(o.created_at||'')} · ${money(o.total)}</small>${o.codes?.length?`<div class="codes"><b>الأكواد:</b><br>${o.codes.map(c=>esc(c.code)).join('<br>')}</div>`:'<small>سيظهر الكود هنا بعد تأكيد الدفع.</small>'}</div>`).join(''):'<p>لا توجد طلبات حتى الآن.</p>'}catch(e){box.innerHTML=`<p>${esc(e.message)}</p>`}}
+    async function handleReturn(){const q=new URLSearchParams(location.search);if(q.get('paypal')!=='success')return;const token=await window.novaGetToken?.();if(!token)return;try{toast('جارٍ تأكيد الدفع وتسليم الكود...');const d=await api('/api/paypal/capture-order',{method:'POST',headers:{Authorization:`Bearer ${token}`},body:JSON.stringify({orderId:q.get('order'),paypalOrderId:q.get('token')})});if(d.ok){toast('تم الدفع وتسليم الأكواد بنجاح');openModal('#ordersModal');loadOrders()}history.replaceState({},'',location.pathname)}catch(e){toast(e.message)}}window.novaHandlePaypalReturn=handleReturn;
+    onAuthStateChanged(auth,u=>{const b=$('#accountBtn');const ob=$('#ordersBtn');if(u){b.textContent=u.displayName||'حسابي';b.title='تسجيل الخروج';ob.hidden=false;setTimeout(handleReturn,250)}else{b.textContent='تسجيل الدخول';b.title='تسجيل الدخول';ob.hidden=true;closeModal('#ordersModal')}});
+    $('#accountBtn').onclick=async()=>{if(auth.currentUser){await signOut(auth);toast('تم تسجيل الخروج')}else openModal('#authModal')};$('#ordersBtn').onclick=()=>{openModal('#ordersModal');loadOrders()};$('#closeAuth').onclick=()=>closeModal('#authModal');$('#closeCheckout').onclick=()=>closeModal('#checkoutModal');$('#closeOrders').onclick=()=>closeModal('#ordersModal');document.querySelectorAll('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)closeModal('#'+m.id)});
+    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.auth-view').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#'+t.dataset.view).classList.add('active');$('#authMessage').classList.remove('show')});
+    $('#googleBtn').onclick=async()=>{try{await signInWithPopup(auth,provider);closeModal('#authModal');toast('تم تسجيل الدخول بواسطة Google')}catch(e){if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment'].includes(e.code))await signInWithRedirect(auth,provider);else{$('#authMessage').textContent=msg('',e.code);$('#authMessage').classList.add('show')}}};getRedirectResult(auth).catch(e=>{if(e.code){$('#authMessage').textContent=msg('',e.code);$('#authMessage').classList.add('show')}});
+    $('#loginForm').onsubmit=async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$('#loginEmail').value.trim(),$('#loginPassword').value);closeModal('#authModal');toast('تم تسجيل الدخول بنجاح')}catch(x){$('#authMessage').textContent=msg('',x.code);$('#authMessage').classList.add('show')}};$('#signupForm').onsubmit=async e=>{e.preventDefault();try{const r=await createUserWithEmailAndPassword(auth,$('#signupEmail').value.trim(),$('#signupPassword').value);await updateProfile(r.user,{displayName:$('#signupName').value.trim()});closeModal('#authModal');toast('تم إنشاء الحساب بنجاح')}catch(x){$('#authMessage').textContent=msg('',x.code);$('#authMessage').classList.add('show')}};
+    $('#checkoutForm').onsubmit=async e=>{e.preventDefault();if(!selectedProduct)return;const box=$('#checkoutMessage');box.classList.remove('show');const token=await window.novaGetToken();const fd=new FormData(e.target);const name=String(fd.get('name')||'').trim();if(name.length<2){box.textContent='اكتب الاسم الكامل بشكل صحيح.';box.classList.add('show');return}try{toast('جارٍ تجهيز الدفع...');const order=await api('/api/orders',{method:'POST',headers:{Authorization:`Bearer ${token}`},body:JSON.stringify({items:[{id:selectedProduct.id,qty:1}],customerName:name,phone:String(fd.get('phone')||'').trim(),note:String(fd.get('note')||'').trim()})});const pay=await api('/api/paypal/create-order',{method:'POST',headers:{Authorization:`Bearer ${token}`},body:JSON.stringify({orderId:order.id})});const target=new URL(String(pay.approvalUrl||'').trim(),location.origin);if(!['http:','https:'].includes(target.protocol))throw new Error('رابط PayPal غير صالح.');location.href=target.href}catch(x){box.textContent=x.message;box.classList.add('show')}};
+    $('#searchInput').oninput=renderProducts;document.querySelectorAll('.pill').forEach(b=>b.onclick=()=>{activeFilter=b.dataset.filter;document.querySelectorAll('.pill').forEach(x=>x.classList.toggle('active',x===b));renderProducts()});$('#categoriesList').onclick=e=>{const b=e.target.closest('[data-cat]');if(b){activeCategory=b.dataset.cat;render()}};$('#productsList').onclick=e=>{const b=e.target.closest('[data-buy]');if(b)buy(b.dataset.buy)};$('#year').textContent=new Date().getFullYear();load();
   </script>
 </body>
 </html>
