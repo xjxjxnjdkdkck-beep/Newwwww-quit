@@ -1,0 +1,12 @@
+{
+  "name": "riwaq-marketplace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "متجر ومنصة خدمات عربية خفيفة متوافقة مع Render",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
