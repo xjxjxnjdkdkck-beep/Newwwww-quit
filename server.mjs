@@ -13,7 +13,10 @@ const firebaseKeys = createRemoteJWKSet(new URL('https://www.googleapis.com/serv
 const databaseUrl = String(process.env.DATABASE_URL || '').trim();
 if (!databaseUrl) throw new Error('DATABASE_URL is required. Add the Aiven MySQL connection URL to Render Environment Variables.');
 const dbUrl = new URL(databaseUrl);
-const pool = mysql.createPool({ host: dbUrl.hostname, port: Number(dbUrl.port || 3306), user: decodeURIComponent(dbUrl.username), password: decodeURIComponent(dbUrl.password), database: dbUrl.pathname.replace(/^\//,''), waitForConnections: true, connectionLimit: 8, ssl: { rejectUnauthorized: true } });
+
+// تم تعديل هذا السطر لجعل rejectUnauthorized: false لحل مشكلة الشهادة
+const pool = mysql.createPool({ host: dbUrl.hostname, port: Number(dbUrl.port || 3306), user: decodeURIComponent(dbUrl.username), password: decodeURIComponent(dbUrl.password), database: dbUrl.pathname.replace(/^\//,''), waitForConnections: true, connectionLimit: 8, ssl: { rejectUnauthorized: false } });
+
 const adminRate = new Map();
 
 const seedProducts = [
