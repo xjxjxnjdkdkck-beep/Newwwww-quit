@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://newwwww-quit.onrender.com/sitemap.xml
