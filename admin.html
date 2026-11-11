@@ -13,10 +13,25 @@ body.dark{--bg:#080e20;--surface:#101a31;--surface2:#141f39;--ink:#e5ecf8;--mute
 @media(max-width:760px){.sidebar{width:min(300px,84vw);transform:translateX(105%)}.sidebar.open{transform:none}.overlay.show{display:block;position:fixed;inset:0;background:#06132d88;z-index:25}.main{margin-right:0;padding:0 14px 28px}.menu-btn{display:grid}.topbar{height:67px}.page-title{font-size:17px}.page-sub,.page-eyebrow,.user-meta,.searchbox{display:none}.content{padding-top:19px}.top-right{gap:7px}.user{padding:2px}.avatar{width:32px;height:32px}.page-head{align-items:flex-start;flex-direction:column}.page-head h2{font-size:19px}.stats{gap:9px}.stat{min-height:99px;padding:12px}.stat strong{font-size:20px}.stat-label{font-size:9px}.stat-icon{width:29px;height:29px;font-size:14px}.card{padding:13px}.report-grid{grid-template-columns:repeat(2,1fr)}.settings-grid{grid-template-columns:1fr}.category-list{grid-template-columns:1fr}.toolbar{align-items:stretch}.filters{width:100%}.filter-search{flex:1;min-width:0}.actions{width:100%}.quick-grid{gap:7px}.quick{font-size:9px;padding:9px}.table th,.table td{padding:9px 8px}.overlay.show{display:block}}
 @media(max-width:390px){.main{padding-inline:10px}.topbar{gap:5px}.top-left{gap:7px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:10px}.quick{gap:6px}.quick span:first-child{width:28px;height:28px}.report-grid{grid-template-columns:1fr 1fr}.report-card{padding:13px}.report-card strong{font-size:19px}}
 .sidebar{overflow-y:auto;overscroll-behavior:contain}
+.layout[hidden]{display:none!important}.login-gate{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 10% 10%,#1d4ca077,transparent 32%),linear-gradient(145deg,#070d1d,#101a32 58%,#0a1530);color:#e8efff}.login-card{width:min(420px,100%);padding:28px;background:#101a31;border:1px solid #ffffff18;border-radius:23px;box-shadow:0 28px 90px #02071580}.login-brand{display:flex;align-items:center;gap:12px;margin-bottom:23px}.login-brand .brand-mark{flex:0 0 48px}.login-brand strong{font-size:20px;color:#fff}.login-brand small{display:block;color:#9badcc;font-size:10px;margin-top:3px}.login-card h1{font-size:20px;margin:0;color:#fff}.login-card>p{font-size:11px;color:#a8b6d0;margin:6px 0 18px}.login-card .field{margin:12px 0}.login-card .field label{color:#d2def4}.login-card .field input{background:#0b1327;border-color:#2b3854;color:#fff;height:43px}.login-card .field input::placeholder{color:#71809b}.login-error{display:none;background:#3a202a;color:#ffb3ba;border:1px solid #64313b;border-radius:11px;padding:10px;font-size:10px;margin-top:12px}.login-error.show{display:block}.login-submit{width:100%;margin-top:6px;height:42px}.login-foot{font-size:9px;color:#788aa9;margin-top:15px;text-align:center}.login-submit:disabled{opacity:.65;cursor:wait}.top-right .logout{color:#beccdf}
 </style>
 </head>
 <body>
-<div class="layout">
+<section class="login-gate" id="loginGate">
+  <div class="login-card">
+    <div class="login-brand"><div class="brand-mark">م</div><div><strong>متجر مارو</strong><small>مركز التحكم الآمن</small></div></div>
+    <h1>تسجيل دخول الإدارة</h1>
+    <p>أدخل بريد وكلمة مرور حساب المدير المصرّح به للمتابعة.</p>
+    <form id="loginForm" autocomplete="on">
+      <div class="field"><label for="loginEmail">البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="username" required placeholder="admin@example.com"></div>
+      <div class="field"><label for="loginPassword">كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••"></div>
+      <button class="btn primary login-submit" id="loginSubmit" type="submit">دخول آمن إلى اللوحة</button>
+      <div class="login-error" id="loginError" role="alert"></div>
+    </form>
+    <div class="login-foot">يتم التحقق من الحساب لدى Firebase وخادم المتجر.</div>
+  </div>
+</section>
+<div class="layout" id="dashboardApp" hidden>
 <aside class="sidebar" id="sidebar">
   <div class="brand"><div class="brand-mark">م</div><div><div class="brand-name">متجر مارو</div><div class="brand-sub">DIGITAL COMMERCE</div></div></div>
   <div class="side-label">إدارة المتجر</div>
@@ -47,7 +62,7 @@ body.dark{--bg:#080e20;--surface:#101a31;--surface2:#141f39;--ink:#e5ecf8;--mute
 <main class="main">
 <header class="topbar">
   <div class="top-left"><button class="icon-btn menu-btn" id="menuBtn" aria-label="القائمة">☰</button><div><div class="page-eyebrow">متجر مارو / لوحة التحكم</div><h1 class="page-title" id="topTitle">نظرة عامة</h1><div class="page-sub">تابع متجرك وطلباتك ومخزونك من مكان واحد</div></div></div>
-  <div class="top-right"><label class="searchbox"><span>⌕</span><input id="globalSearch" placeholder="ابحث في لوحة التحكم" aria-label="بحث"></label><button class="icon-btn" id="themeBtn" title="تبديل المظهر" aria-label="تبديل المظهر">◐</button><button class="icon-btn" id="storeBtn" title="فتح المتجر" aria-label="فتح المتجر">↗</button><div class="user"><div class="avatar">م</div><div class="user-meta"><b>مدير المتجر</b><small>حساب الإدارة</small></div></div></div>
+  <div class="top-right"><label class="searchbox"><span>⌕</span><input id="globalSearch" placeholder="ابحث في لوحة التحكم" aria-label="بحث"></label><button class="icon-btn" id="themeBtn" title="تبديل المظهر" aria-label="تبديل المظهر">◐</button><button class="icon-btn" id="storeBtn" title="فتح المتجر" aria-label="فتح المتجر">↗</button><div class="user"><div class="avatar">م</div><div class="user-meta"><b id="adminName">مدير المتجر</b><small>حساب الإدارة</small></div></div><button class="icon-btn logout" id="logoutBtn" title="تسجيل الخروج" aria-label="تسجيل الخروج">⇦</button></div>
 </header>
 <div class="content">
 <div class="notice"><b>نسخة واجهة تجريبية:</b> التغييرات تحفظ محليًا في هذا المتصفح فقط. ربطها بمخزونك وطلباتك الحقيقية يحتاج دمجًا آمنًا مع الخادم وقاعدة البيانات.</div>
@@ -95,8 +110,15 @@ body.dark{--bg:#080e20;--surface:#101a31;--surface2:#141f39;--ink:#e5ecf8;--mute
 </div>
 <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
 <div class="toast" id="toast"></div>
-<script>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,inMemoryPersistence} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 (()=>{
+const firebaseConfig={apiKey:'AIzaSyAZucoNuZyKDoxfS7tboc3-ZttqONuw_vw',authDomain:'maro-store-4dc09.firebaseapp.com',projectId:'maro-store-4dc09',storageBucket:'maro-store-4dc09.firebasestorage.app',messagingSenderId:'55163169834',appId:'1:55163169834:web:48ba5eda57e23c41886753',measurementId:'G-FZWPNG5XD3'};
+const auth=getAuth(initializeApp(firebaseConfig));
+const authErrorText=code=>({'auth/invalid-credential':'البريد الإلكتروني أو كلمة المرور غير صحيحة.','auth/invalid-email':'صيغة البريد الإلكتروني غير صحيحة.','auth/too-many-requests':'محاولات كثيرة. انتظر قليلًا ثم أعد المحاولة.','auth/network-request-failed':'تعذر الاتصال. تحقق من الإنترنت وحاول مجددًا.','auth/unauthorized-domain':'هذا النطاق غير مضاف ضمن النطاقات المصرّح بها في Firebase.'}[code]||'تعذر تسجيل الدخول. تأكد من بيانات الحساب وحاول مجددًا.');
+function showLogin(message){const app=document.querySelector('#dashboardApp'),gate=document.querySelector('#loginGate'),err=document.querySelector('#loginError');if(app)app.hidden=true;if(gate)gate.hidden=false;if(err&&message!==undefined){err.textContent=message;err.classList.toggle('show',!!message)}}
+async function verifyAdmin(user){const gate=document.querySelector('#loginGate'),app=document.querySelector('#dashboardApp'),err=document.querySelector('#loginError');try{const token=await user.getIdToken(true);const response=await fetch('/api/admin/products',{method:'GET',headers:{Authorization:`Bearer ${token}`},cache:'no-store'});if(!response.ok){await signOut(auth);showLogin(response.status===401||response.status===403?'هذا الحساب مسجّل، لكنه لا يملك صلاحية إدارة المتجر.':'تعذر التحقق من صلاحيات الإدارة.');return}if(err){err.textContent='';err.classList.remove('show')}if(gate)gate.hidden=true;if(app)app.hidden=false;const label=document.querySelector('#adminName');if(label)label.textContent=user.email||'مدير المتجر'}catch(e){await signOut(auth);showLogin('تعذر الاتصال بخادم المتجر للتحقق من الصلاحية. حاول مرة أخرى.')}}
 const seed={products:[
 {id:1,name:'شحن PUBG Mobile',category:'ألعاب',price:2.99,stock:0,active:true},
 {id:2,name:'باقة ADSL شهرية',category:'إنترنت',price:8,stock:0,active:true},
@@ -155,6 +177,10 @@ $('#menuBtn').onclick=()=>{$('#sidebar').classList.add('open');$('#overlay').cla
 function setTheme(d){document.body.classList.toggle('dark',d);localStorage.setItem('maro_admin_theme',d?'dark':'light')};setTheme(localStorage.getItem('maro_admin_theme')!=='light');$('#themeBtn').onclick=()=>setTheme(!document.body.classList.contains('dark'));$('#settingsTheme').onclick=()=>setTheme(!document.body.classList.contains('dark'));
 $('#refreshBtn').onclick=()=>{renderAll();toast('تم تحديث بيانات العرض')};$('#storeBtn').onclick=()=>window.open('https://newwwww-quit.onrender.com/','_blank','noopener');$('#globalSearch').onkeydown=e=>{if(e.key==='Enter'){const v=e.target.value.trim();$('#productSearch').value=v;page('products');$('#productSearch').value=v;renderProducts()}};
 $('#chartPeriod').onchange=()=>toast('الرسم توضيحي لبيانات العرض');$('#modalBackdrop').addEventListener('click',e=>{if(e.target===$('#modalBackdrop'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+const authReady=setPersistence(auth,inMemoryPersistence).then(()=>signOut(auth)).catch(()=>{});
+$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const button=$('#loginSubmit'),email=$('#loginEmail').value.trim(),password=$('#loginPassword').value;button.disabled=true;button.textContent='جارٍ التحقق...';showLogin('');try{await authReady;await signInWithEmailAndPassword(auth,email,password);$('#loginPassword').value=''}catch(error){$('#loginPassword').value='';showLogin(authErrorText(error.code))}finally{button.disabled=false;button.textContent='دخول آمن إلى اللوحة'}});
+authReady.then(()=>onAuthStateChanged(auth,user=>{if(user)verifyAdmin(user);else showLogin()}));
+$('#logoutBtn').addEventListener('click',async()=>{showLogin('');$('#loginPassword').value='';await signOut(auth)});
 mountModules();renderAll();
 })();
 </script>
