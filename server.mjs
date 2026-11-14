@@ -1,247 +1,180 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b1f4e">
-<title>لوحة مارو | إدارة المتجر</title>
-<style>
-[hidden] { display: none !important; }
+import express from 'express';
+import mysql from 'mysql2/promise';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-:root{--bg:#f3f6fb;--surface:#fff;--surface2:#f7f9fd;--ink:#172742;--muted:#71809b;--line:#e4eaf3;--navy:#0b1f4e;--blue:#1264ff;--blue2:#0847c7;--orange:#ff7518;--green:#15966a;--red:#df4e5a;--yellow:#c98500;--shadow:0 12px 36px rgba(20,52,105,.07);--side:#0b1f4e;--side2:#104bc0;--radius:20px}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.55}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.layout{min-height:100vh}.sidebar{position:fixed;z-index:30;inset:0 0 0 auto;width:268px;padding:20px 15px;background:linear-gradient(165deg,var(--side),var(--side2));color:#fff;display:flex;flex-direction:column;transition:transform .25s ease;box-shadow:-12px 0 38px #0b1f4e20}.brand{display:flex;align-items:center;gap:12px;padding:7px 10px 22px;border-bottom:1px solid #ffffff1c}.brand-mark{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#fff,#dfeaff);color:var(--blue);display:grid;place-items:center;font-size:25px;font-weight:950;box-shadow:0 8px 24px #06163b30}.brand-name{font-weight:900;font-size:18px;line-height:1.1}.brand-sub{font-size:10px;color:#bbd3ff;margin-top:5px;letter-spacing:.3px}.side-label{font-size:10px;color:#a8c5fa;font-weight:800;padding:22px 12px 9px}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#dae6ff;border-radius:13px;text-align:right;padding:11px 12px;display:flex;align-items:center;gap:12px;font-size:13px;font-weight:750;transition:.18s}.nav button:hover,.nav button.active{background:#ffffff19;color:#fff;box-shadow:inset -3px 0 var(--orange)}.nav-ico{width:29px;height:29px;border-radius:9px;background:#ffffff12;display:grid;place-items:center;font-size:17px;color:#c4dcff}.nav button.active .nav-ico{background:linear-gradient(145deg,var(--orange),#e45c00);color:#fff}.nav-badge{margin-right:auto;min-width:22px;padding:1px 6px;text-align:center;border-radius:20px;background:#ff75182a;color:#ffc49d;font-size:10px}.side-spacer{flex:1}.side-bottom{border:1px solid #ffffff20;background:#ffffff0b;border-radius:15px;padding:12px;color:#cfddf7;font-size:10px}.health{display:flex;align-items:center;gap:8px;margin-bottom:5px}.dot{width:8px;height:8px;border-radius:50%;background:#32d39a;box-shadow:0 0 0 4px #32d39a20}.side-bottom small{color:#9cb8e8}.main{margin-right:268px;min-height:100vh;padding:0 30px 40px;transition:margin .25s}.topbar{height:78px;display:flex;align-items:center;justify-content:space-between;gap:15px;position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.top-left,.top-right{display:flex;align-items:center;gap:13px}.page-eyebrow{font-size:10px;color:var(--muted);font-weight:700}.page-title{font-size:21px;color:var(--navy);margin:0;font-weight:900}.page-sub{font-size:11px;color:var(--muted);margin-top:2px}.icon-btn{width:39px;height:39px;border:1px solid var(--line);background:var(--surface);color:var(--navy);border-radius:12px;display:grid;place-items:center;font-size:17px}.icon-btn:hover{border-color:#aac5f7;color:var(--blue)}.menu-btn{display:none}.searchbox{height:39px;border:1px solid var(--line);border-radius:12px;background:var(--surface);display:flex;align-items:center;gap:7px;padding:0 11px;color:var(--muted);width:220px}.searchbox input{border:0;outline:0;background:transparent;color:var(--ink);width:100%;font-size:12px}.user{display:flex;align-items:center;gap:8px;padding:4px 7px;border-radius:13px}.avatar{width:35px;height:35px;border-radius:12px;background:#e7efff;color:var(--blue);display:grid;place-items:center;font-weight:900}.user b{font-size:11px;display:block}.user small{font-size:9px;color:var(--muted)}.content{max-width:1500px;margin:auto;padding-top:25px}.page{display:none;animation:fade .2s ease}.page.active{display:block}@keyframes fade{from{opacity:.45;transform:translateY(4px)}to{opacity:1;transform:none}}.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:0 0 18px}.page-head h2{margin:0;color:var(--navy);font-size:22px;font-weight:900}.page-head p{margin:5px 0 0;color:var(--muted);font-size:11px}.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:9px 13px;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.16s}.btn:hover{transform:translateY(-1px);box-shadow:0 7px 18px #16376812}.btn.primary{background:linear-gradient(135deg,var(--orange),#e85e00);border-color:transparent;color:#fff;box-shadow:0 7px 17px #ff75182c}.btn.blue{background:var(--blue);color:#fff;border-color:var(--blue)}.btn.danger{color:var(--red);background:#fff5f5;border-color:#ffe1e3}.btn.small{padding:6px 9px;font-size:10px;border-radius:9px}.grid{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:15px}.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 17px;min-height:112px;box-shadow:var(--shadow);position:relative;overflow:hidden}.stat:after{content:"";position:absolute;left:-35px;bottom:-57px;width:105px;height:105px;border-radius:50%;background:#1264ff0b}.stat-top{display:flex;align-items:center;justify-content:space-between}.stat-label{font-size:10px;color:var(--muted);font-weight:750}.stat-icon{width:34px;height:34px;border-radius:11px;background:#eef4ff;color:var(--blue);display:grid;place-items:center;font-size:16px}.stat strong{display:block;font-size:24px;color:var(--navy);margin-top:11px;line-height:1.1}.stat-foot{font-size:9px;color:var(--muted);margin-top:7px}.up{color:var(--green);font-weight:800}.warn{color:var(--yellow);font-weight:800}.overview-grid{grid-template-columns:minmax(0,1.55fr) minmax(270px,.85fr);margin-bottom:15px}.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:17px;box-shadow:var(--shadow);min-width:0}.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}.card-head h3{font-size:13px;color:var(--navy);margin:0;font-weight:900}.card-head p{font-size:9px;color:var(--muted);margin:3px 0 0}.select{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 9px;font-size:10px;outline:0}.chart{height:185px;display:flex;align-items:end;justify-content:space-around;gap:9px;border-bottom:1px solid var(--line);padding:15px 5px 0;position:relative;background:repeating-linear-gradient(to bottom,transparent 0,transparent 43px,var(--line) 44px)}.bar-col{height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:7px;flex:1;z-index:1}.bar{width:min(28px,75%);min-height:3px;border-radius:8px 8px 2px 2px;background:linear-gradient(180deg,#66b9ff,var(--blue));box-shadow:0 4px 12px #1264ff25}.bar-col small{font-size:9px;color:var(--muted);white-space:nowrap}.status-list{display:grid;gap:11px}.status-row{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted)}.status-row strong{color:var(--ink);font-size:11px}.status-name{display:flex;align-items:center;gap:8px}.status-dot{width:8px;height:8px;border-radius:50%;background:var(--orange)}.status-dot.blue{background:var(--blue)}.status-dot.green{background:var(--green)}.status-dot.red{background:var(--red)}.status-dot.gray{background:#a3aec0}.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.quick{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:right;color:var(--navy);font-size:10px;font-weight:800;display:flex;gap:10px;align-items:center}.quick:hover{border-color:#b4cdfa;background:#f2f7ff}.quick span:first-child{width:33px;height:33px;background:#eaf2ff;color:var(--blue);border-radius:11px;display:grid;place-items:center;font-size:16px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}.table{border-collapse:collapse;width:100%;min-width:660px}.table th,.table td{text-align:right;padding:11px 10px;border-bottom:1px solid var(--line);font-size:10px;vertical-align:middle}.table th{background:var(--surface2);color:var(--muted);font-size:9px;font-weight:800;white-space:nowrap}.table tr:last-child td{border-bottom:0}.table td strong{color:var(--navy);font-size:10px}.table td small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:30px;font-size:9px;font-weight:800;white-space:nowrap}.status-pill:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.st-pending{color:#b27400;background:#fff5d8}.st-paid{color:#087d58;background:#e3f8ef}.st-processing{color:#1264ff;background:#eaf2ff}.st-completed{color:#18825e;background:#e8f8ef}.st-cancelled,.st-failed{color:#ca4551;background:#fff0f1}.st-active{color:#16835f;background:#e8f8ef}.st-hidden{color:#768298;background:#eef1f5}.inline-actions{display:flex;gap:5px;flex-wrap:wrap}.stock-bar{height:6px;width:72px;background:#edf1f7;border-radius:20px;overflow:hidden;display:inline-block;vertical-align:middle}.stock-bar i{display:block;height:100%;background:var(--blue);border-radius:20px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:13px}.filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.filter-search{height:36px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:0 10px;min-width:210px;display:flex;align-items:center;gap:7px}.filter-search input{width:100%;border:0;outline:0;background:transparent;font-size:10px;color:var(--ink)}.category-list{grid-template-columns:repeat(3,1fr)}.category-card{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.category-card h3{font-size:13px;margin:0;color:var(--navy)}.category-card p{font-size:9px;color:var(--muted);margin:4px 0 0}.category-count{background:#edf4ff;color:var(--blue);padding:5px 8px;border-radius:10px;font-size:9px;font-weight:850;white-space:nowrap}.report-grid{grid-template-columns:repeat(3,1fr);margin-bottom:14px}.report-card{padding:17px;border:1px solid var(--line);border-radius:17px;background:var(--surface);box-shadow:var(--shadow)}.report-card small{font-size:10px;color:var(--muted)}.report-card strong{display:block;font-size:23px;color:var(--navy);margin-top:8px}.settings-grid{grid-template-columns:repeat(2,1fr)}.settings-row{padding:12px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}.settings-row:last-child{border-bottom:0}.settings-row b{font-size:11px}.settings-row small{display:block;color:var(--muted);font-size:9px;margin-top:3px}.notice{border:1px solid #ffdfba;background:#fff8ef;color:#8b4d0b;border-radius:14px;padding:12px;font-size:10px;margin-bottom:14px}.empty{text-align:center;color:var(--muted);padding:24px;font-size:11px}.modal-backdrop{position:fixed;inset:0;z-index:60;background:#06183b99;display:none;place-items:center;padding:15px;backdrop-filter:blur(4px)}.modal-backdrop.open{display:grid}.modal{width:min(520px,100%);max-height:90vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:19px;box-shadow:0 24px 70px #06183b40}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.modal-head h3{margin:0;color:var(--navy);font-size:17px}.close{border:0;width:32px;height:32px;border-radius:10px;background:var(--surface2);color:var(--muted);font-size:19px}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:13px}.field{display:grid;gap:5px}.field.wide{grid-column:1/-1}.field label{font-size:10px;color:var(--muted);font-weight:800}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 10px;outline:0;font-size:11px}.field textarea{min-height:82px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:#83abf4;box-shadow:0 0 0 3px #1264ff12}.modal-actions{display:flex;justify-content:flex-start;gap:8px;margin-top:15px}.toast{position:fixed;left:18px;bottom:18px;z-index:80;background:var(--navy);color:white;border-radius:12px;padding:11px 15px;font-size:11px;box-shadow:0 10px 30px #06183b35;opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:none}.overlay{display:none}
-body.dark{--bg:#080e20;--surface:#101a31;--surface2:#141f39;--ink:#e5ecf8;--muted:#96a6c2;--line:#25324b;--navy:#e5ecf8;--shadow:0 12px 36px #02071650;--side:#080e20;--side2:#101b35}body.dark .stat-icon{background:#1c2a49}body.dark .quick:hover{background:#172541}body.dark .st-pending{background:#3a2b13;color:#ffd779}body.dark .st-paid,body.dark .st-completed,body.dark .st-active{background:#103329;color:#7be0b2}body.dark .st-processing{background:#172b50;color:#90b6ff}body.dark .st-cancelled,body.dark .st-failed{background:#3a202a;color:#ff9aa4}body.dark .st-hidden{background:#252e40;color:#b1bed0}body.dark .notice{background:#322715;border-color:#61451b;color:#ffd48a}body.dark .category-count{background:#1a2a4b;color:#a9c8ff}body.dark .btn.danger{background:#301f29;border-color:#4b2a36}body.dark .avatar{background:#1a2d50}
-@media(max-width:1080px){.stats{grid-template-columns:repeat(2,1fr)}.quick-grid{grid-template-columns:repeat(2,1fr)}.overview-grid{grid-template-columns:1fr}.category-list{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:760px){.sidebar{width:min(300px,84vw);transform:translateX(105%)}.sidebar.open{transform:none}.overlay.show{display:block;position:fixed;inset:0;background:#06132d88;z-index:25}.main{margin-right:0;padding:0 14px 28px}.menu-btn{display:grid}.topbar{height:67px}.page-title{font-size:17px}.page-sub,.page-eyebrow,.user-meta,.searchbox{display:none}.content{padding-top:19px}.top-right{gap:7px}.user{padding:2px}.avatar{width:32px;height:32px}.page-head{align-items:flex-start;flex-direction:column}.page-head h2{font-size:19px}.stats{gap:9px}.stat{min-height:99px;padding:12px}.stat strong{font-size:20px}.stat-label{font-size:9px}.stat-icon{width:29px;height:29px;font-size:14px}.card{padding:13px}.report-grid{grid-template-columns:repeat(2,1fr)}.settings-grid{grid-template-columns:1fr}.category-list{grid-template-columns:1fr}.toolbar{align-items:stretch}.filters{width:100%}.filter-search{flex:1;min-width:0}.actions{width:100%}.quick-grid{gap:7px}.quick{font-size:9px;padding:9px}.table th,.table td{padding:9px 8px}.overlay.show{display:block}}
-@media(max-width:390px){.main{padding-inline:10px}.topbar{gap:5px}.top-left{gap:7px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{padding:10px}.quick{gap:6px}.quick span:first-child{width:28px;height:28px}.report-grid{grid-template-columns:1fr 1fr}.report-card{padding:13px}.report-card strong{font-size:19px}}
-.sidebar{overflow-y:auto;overscroll-behavior:contain}
-.layout[hidden]{display:none!important}.login-gate{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 10% 10%,#1d4ca077,transparent 32%),linear-gradient(145deg,#070d1d,#101a32 58%,#0a1530);color:#e8efff}.login-card{width:min(420px,100%);padding:28px;background:#101a31;border:1px solid #ffffff18;border-radius:23px;box-shadow:0 28px 90px #02071580}.login-brand{display:flex;align-items:center;gap:12px;margin-bottom:23px}.login-brand .brand-mark{flex:0 0 48px}.login-brand strong{font-size:20px;color:#fff}.login-brand small{display:block;color:#9badcc;font-size:10px;margin-top:3px}.login-card h1{font-size:20px;margin:0;color:#fff}.login-card>p{font-size:11px;color:#a8b6d0;margin:6px 0 18px}.login-card .field{margin:12px 0}.login-card .field label{color:#d2def4}.login-card .field input{background:#0b1327;border-color:#2b3854;color:#fff;height:43px}.login-card .field input::placeholder{color:#71809b}.login-error{display:none;background:#3a202a;color:#ffb3ba;border:1px solid #64313b;border-radius:11px;padding:10px;font-size:10px;margin-top:12px}.login-error.show{display:block}.login-submit{width:100%;margin-top:6px;height:42px}.login-foot{font-size:9px;color:#788aa9;margin-top:15px;text-align:center}.login-submit:disabled{opacity:.65;cursor:wait}.top-right .logout{color:#beccdf}
-</style>
-</head>
-<body>
-<section class="login-gate" id="loginGate">
-  <div class="login-card">
-    <div class="login-brand"><div class="brand-mark">م</div><div><strong>متجر مارو</strong><small>مركز التحكم الآمن</small></div></div>
-    <h1>تسجيل دخول الإدارة</h1>
-    <p>أدخل بريد وكلمة مرور حساب المدير المصرّح به للمتابعة.</p>
-    <form id="loginForm" autocomplete="on" onsubmit="event.preventDefault();">
-      <div class="field"><label for="loginEmail">البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="username" required placeholder="admin@example.com"></div>
-      <div class="field"><label for="loginPassword">كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••"></div>
-      <button class="btn primary login-submit" id="loginSubmit" type="submit">دخول آمن إلى اللوحة</button>
-      <div class="login-error" id="loginError" role="alert"></div>
-    </form>
-    <div class="login-foot">يتم التحقق من الحساب لدى Firebase وخادم المتجر.</div>
-  </div>
-</section>
-<div class="layout" id="dashboardApp" hidden>
-<aside class="sidebar" id="sidebar">
-  <div class="brand"><div class="brand-mark">م</div><div><div class="brand-name">متجر مارو</div><div class="brand-sub">DIGITAL COMMERCE</div></div></div>
-  <div class="side-label">إدارة المتجر</div>
-  <nav class="nav" id="nav">
-    <button class="active" data-page="overview"><span class="nav-ico">⌂</span>نظرة عامة</button>
-    <button data-page="reports"><span class="nav-ico">▥</span>تقارير المبيعات</button>
-    <button data-page="users"><span class="nav-ico">♙</span>المستخدمون</button>
-    <button data-page="verification"><span class="nav-ico">✓</span>طلبات التوثيق</button>
-    <button data-page="centers"><span class="nav-ico">♧</span>مراكز المستخدمين</button>
-    <button data-page="suppliers"><span class="nav-ico">⬡</span>المزودون</button>
-    <button data-page="supplierOrders"><span class="nav-ico">⬡</span>طلبات المزود</button>
-    <button data-page="manualOrders"><span class="nav-ico">▤</span>الطلبات اليدوية</button>
-    <button data-page="products"><span class="nav-ico">▣</span>المنتجات</button>
-    <button data-page="categories"><span class="nav-ico">◫</span>التصنيفات</button>
-    <button data-page="shipping"><span class="nav-ico">♧</span>طلبات الشحن</button>
-    <button data-page="paymentMethods"><span class="nav-ico">▱</span>طرق الدفع</button>
-    <button data-page="paymentCategories"><span class="nav-ico">☷</span>أقسام الدفع</button>
-    <button data-page="currencies"><span class="nav-ico">◉</span>العملات</button>
-    <button data-page="suggestions"><span class="nav-ico">♧</span>اقتراحات المنتجات</button>
-    <button data-page="notifications"><span class="nav-ico">⚑</span>الإشعارات</button>
-    <button data-page="settings"><span class="nav-ico">☷</span>إعدادات الموقع</button>
-  </nav>
-  <div class="side-spacer"></div>
-  <a class="btn" href="https://newwwww-quit.onrender.com/" style="margin:12px 0;color:#fff;background:#ffffff12;border-color:#ffffff20">⌂ العودة إلى المتجر</a>
-  <div class="side-bottom"><div class="health"><i class="dot"></i><b>Admin User</b></div><small>حساب عرض تجريبي · غير متصل بقاعدة الإنتاج</small></div>
-</aside>
-<div class="overlay" id="overlay"></div>
-<main class="main">
-<header class="topbar">
-  <div class="top-left"><button class="icon-btn menu-btn" id="menuBtn" aria-label="القائمة">☰</button><div><div class="page-eyebrow">متجر مارو / لوحة التحكم</div><h1 class="page-title" id="topTitle">نظرة عامة</h1><div class="page-sub">تابع متجرك وطلباتك ومخزونك من مكان واحد</div></div></div>
-  <div class="top-right"><label class="searchbox"><span>⌕</span><input id="globalSearch" placeholder="ابحث في لوحة التحكم" aria-label="بحث"></label><button class="icon-btn" id="themeBtn" title="تبديل المظهر" aria-label="تبديل المظهر">◐</button><button class="icon-btn" id="storeBtn" title="فتح المتجر" aria-label="فتح المتجر">↗</button><div class="user"><div class="avatar">م</div><div class="user-meta"><b id="adminName">مدير المتجر</b><small>حساب الإدارة</small></div></div><button class="icon-btn logout" id="logoutBtn" title="تسجيل الخروج" aria-label="تسجيل الخروج">⇦</button></div>
-</header>
-<div class="content">
-<div class="notice"><b>نسخة واجهة تجريبية:</b> التغييرات تحفظ محليًا في هذا المتصفح فقط. ربطها بمخزونك وطلباتك الحقيقية يحتاج دمجًا آمنًا مع الخادم وقاعدة البيانات.</div>
-<section class="page active" id="page-overview">
-  <div class="page-head"><div><h2>نظرة عامة</h2><p>ملخص سريع لأداء متجر مارو.</p></div><div class="actions"><button class="btn" id="refreshBtn">⟳ تحديث العرض</button><button class="btn primary" data-action="add-product">＋ إضافة منتج</button></div></div>
-  <div class="grid stats" id="stats"></div>
-  <div class="grid overview-grid">
-    <div class="card"><div class="card-head"><div><h3>حركة الطلبات</h3><p>ملخص توضيحي لآخر سبعة أيام</p></div><select class="select" id="chartPeriod"><option>آخر 7 أيام</option><option>آخر 30 يومًا</option></select></div><div class="chart" id="chart"></div></div>
-    <div class="card"><div class="card-head"><div><h3>حالة الطلبات</h3><p>حسب الحالة الحالية</p></div><span class="category-count">مباشر تجريبي</span></div><div class="status-list" id="statusList"></div></div>
-  </div>
-  <div class="card" style="margin-bottom:15px"><div class="card-head"><div><h3>إجراءات سريعة</h3><p>اختصارات المهام الأكثر استخدامًا</p></div></div><div class="quick-grid"><button class="quick" data-action="add-product"><span>＋</span>إضافة منتج</button><button class="quick" data-page="inventory"><span>▦</span>إضافة أكواد للمخزون</button><button class="quick" data-page="orders"><span>▤</span>مراجعة الطلبات</button><button class="quick" data-page="reports"><span>◒</span>عرض التقارير</button></div></div>
-  <div class="card"><div class="card-head"><div><h3>أحدث الطلبات</h3><p>آخر النشاط المسجل في بيانات العرض</p></div><button class="btn small" data-page="orders">عرض كل الطلبات ←</button></div><div class="table-wrap"><table class="table"><thead><tr><th>رقم الطلب</th><th>العميل</th><th>المنتج</th><th>الإجمالي</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody id="recentOrders"></tbody></table></div></div>
-</section>
-<section class="page" id="page-orders">
-  <div class="page-head"><div><h2>إدارة الطلبات</h2><p>ابحث عن الطلبات وراجع حالتها.</p></div><div class="actions"><button class="btn" id="exportOrders">⇩ تصدير CSV</button></div></div>
-  <div class="card"><div class="toolbar"><div class="filters"><label class="filter-search">⌕ <input id="orderSearch" placeholder="ابحث برقم الطلب أو العميل"></label><select class="select" id="orderFilter"><option value="all">كل الحالات</option><option value="pending">معلّق</option><option value="paid">مدفوع</option><option value="processing">قيد المعالجة</option><option value="completed">مكتمل</option><option value="cancelled">ملغي</option></select></div><span class="category-count" id="orderCount">0 طلب</span></div><div class="table-wrap"><table class="table"><thead><tr><th>رقم الطلب</th><th>العميل</th><th>المنتجات</th><th>الإجمالي</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div>
-</section>
-<section class="page" id="page-products">
-  <div class="page-head"><div><h2>المنتجات</h2><p>أدرج المنتجات الرقمية والأسعار المعروضة في المتجر.</p></div><div class="actions"><button class="btn primary" data-action="add-product">＋ إضافة منتج</button></div></div>
-  <div class="card"><div class="toolbar"><div class="filters"><label class="filter-search">⌕ <input id="productSearch" placeholder="ابحث عن منتج أو تصنيف"></label><select class="select" id="productFilter"><option value="all">كل المنتجات</option><option value="active">نشط</option><option value="hidden">مخفي</option></select></div><span class="category-count" id="productCount">0 منتج</span></div><div class="table-wrap"><table class="table"><thead><tr><th>المنتج</th><th>التصنيف</th><th>السعر</th><th>المخزون</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="productsBody"></tbody></table></div></div>
-</section>
-<section class="page" id="page-inventory">
-  <div class="page-head"><div><h2>الأكواد والمخزون</h2><p>أضف الأكواد الرقمية وتابع المتاح منها لكل منتج.</p></div></div>
-  <div class="grid stats" id="inventoryStats"></div>
-  <div class="card"><div class="toolbar"><div><b style="font-size:12px">مخزون المنتجات</b><div style="font-size:9px;color:var(--muted);margin-top:3px">إدارة أكواد العرض التجريبي</div></div><label class="filter-search">⌕ <input id="inventorySearch" placeholder="ابحث عن منتج"></label></div><div class="table-wrap"><table class="table"><thead><tr><th>المنتج</th><th>التصنيف</th><th>السعر</th><th>الأكواد المتاحة</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="inventoryBody"></tbody></table></div></div>
-</section>
-<section class="page" id="page-categories">
-  <div class="page-head"><div><h2>التصنيفات</h2><p>رتّب المنتجات ضمن فئات سهلة للتصفح.</p></div><div class="actions"><button class="btn primary" id="addCategory">＋ إضافة تصنيف</button></div></div>
-  <div class="grid category-list" id="categoryGrid"></div>
-</section>
-<section class="page" id="page-reports">
-  <div class="page-head"><div><h2>المبيعات والتقارير</h2><p>ملخص المبيعات والطلبات والمخزون.</p></div><div class="actions"><button class="btn" id="exportReport">⇩ تصدير تقرير CSV</button></div></div>
-  <div class="grid report-grid" id="reportGrid"></div>
-  <div class="card"><div class="card-head"><div><h3>ملاحظات على الأرقام</h3><p>الفصل بين الطلبات والمبالغ المحصّلة</p></div></div><div class="status-list" id="reportNotes"></div></div>
-</section>
-<section class="page" id="page-settings">
-  <div class="page-head"><div><h2>إعدادات المتجر</h2><p>معلومات عامة وخيارات العرض.</p></div></div>
-  <div class="grid settings-grid">
-    <div class="card"><div class="card-head"><div><h3>هوية المتجر</h3><p>بيانات تظهر للعملاء</p></div></div><div class="settings-row"><div><b>اسم المتجر</b><small>الاسم المعروض في الترويسة</small></div><span>متجر مارو</span></div><div class="settings-row"><div><b>العملة</b><small>الأسعار في الكتالوج</small></div><span>USD — دولار أمريكي</span></div><div class="settings-row"><div><b>لغة المتجر</b><small>اتجاه الواجهة</small></div><span>العربية · RTL</span></div><div class="settings-row"><div><b>الدفع</b><small>حسب معلومات الصفحة المنشورة</small></div><span class="status-pill st-active">PayPal مهيأ</span></div></div>
-    <div class="card"><div class="card-head"><div><h3>السلامة والتشغيل</h3><p>توصيات قبل استقبال طلبات حقيقية</p></div></div><div class="settings-row"><div><b>مخزون الأكواد</b><small>يلزم تعبئة مخزون موثوق قبل تفعيل التسليم</small></div><span class="status-pill st-pending">تحقق مطلوب</span></div><div class="settings-row"><div><b>حالة فهرسة البحث</b><small>أضف sitemap وrobots.txt ثم أرسل sitemap إلى Search Console</small></div><span class="status-pill st-hidden">غير متحقق</span></div><div class="settings-row"><div><b>بيانات الإدارة</b><small>لا تضع كلمات مرور أو مفاتيح سرية في هذا الملف</small></div><span class="status-pill st-processing">خادم آمن فقط</span></div><div class="settings-row"><div><b>مظهر اللوحة</b><small>تبديل فاتح / داكن محفوظ محليًا</small></div><button class="btn small" id="settingsTheme">تبديل المظهر</button></div></div>
-  </div>
-</section>
-</div>
-</main>
-</div>
-<div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
-<div class="toast" id="toast"></div>
-<script type="module">
-import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-(()=>{
-const firebaseConfig={apiKey:'AIzaSyAZucoNuZyKDoxfS7tboc3-ZttqONuw_vw',authDomain:'maro-store-4dc09.firebaseapp.com',projectId:'maro-store-4dc09',storageBucket:'maro-store-4dc09.firebasestorage.app',messagingSenderId:'55163169834',appId:'1:55163169834:web:48ba5eda57e23c41886753',measurementId:'G-FZWPNG5XD3'};
-const auth=getAuth(initializeApp(firebaseConfig));
-const authErrorText=code=>({'auth/invalid-credential':'البريد الإلكتروني أو كلمة المرور غير صحيحة.','auth/invalid-email':'صيغة البريد الإلكتروني غير صحيحة.','auth/too-many-requests':'محاولات كثيرة. انتظر قليلًا ثم أعد المحاولة.','auth/network-request-failed':'تعذر الاتصال. تحقق من الإنترنت وحاول مجددًا.','auth/unauthorized-domain':'هذا النطاق غير مضاف ضمن النطاقات المصرّح بها في Firebase.'}[code]||'تعذر تسجيل الدخول. تأكد من بيانات الحساب وحاول مجددًا.');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const app = express();
+const PORT = Number(process.env.PORT || 3000);
+const PROJECT_ID = 'maro-store-4dc09';
+const PAYPAL_API = process.env.PAYPAL_API_BASE || 'https://api-m.sandbox.paypal.com';
+const firebaseKeys = createRemoteJWKSet(new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'));
 
-function showLogin(message){
-    const app=document.querySelector('#dashboardApp'),gate=document.querySelector('#loginGate'),err=document.querySelector('#loginError');
-    if(app)app.hidden=true;
-    if(gate)gate.hidden=false;
-    if(err&&message!==undefined){err.textContent=message;err.classList.toggle('show',!!message)}
-}
+let pool = null;
+const databaseUrl = String(process.env.DATABASE_URL || '').trim();
 
-async function verifyAdmin(user){
-    const gate=document.querySelector('#loginGate'),app=document.querySelector('#dashboardApp'),err=document.querySelector('#loginError');
-    if (user) {
-        if(err){err.textContent='';err.classList.remove('show')}
-        if(gate)gate.hidden=true;
-        if(app)app.hidden=false;
-        const label=document.querySelector('#adminName');
-        if(label)label.textContent=user.email||'مدير المتجر'
-    } else {
-        if(app)app.hidden=true;
-        if(gate)gate.hidden=false;
+if (databaseUrl) {
+    try {
+        const dbUrl = new URL(databaseUrl);
+        pool = mysql.createPool({ 
+            host: dbUrl.hostname, 
+            port: Number(dbUrl.port || 3306), 
+            user: decodeURIComponent(dbUrl.username), 
+            password: decodeURIComponent(dbUrl.password), 
+            database: dbUrl.pathname.replace(/^\//,''), 
+            waitForConnections: true, 
+            connectionLimit: 8, 
+            ssl: { rejectUnauthorized: false } 
+        });
+        console.log("✅ Database pool created.");
+    } catch (e) {
+        console.error("❌ Invalid DATABASE_URL string:", e.message);
     }
+} else {
+    console.warn("⚠️ DATABASE_URL is missing. Server will run, but database features will fail.");
 }
 
-const seed={products:[
-{id:1,name:'شحن PUBG Mobile',category:'ألعاب',price:2.99,stock:0,active:true},
-{id:2,name:'باقة ADSL شهرية',category:'إنترنت',price:8,stock:0,active:true},
-{id:3,name:'بطاقة Steam Wallet',category:'ألعاب',price:5,stock:0,active:true},
-{id:4,name:'بطاقة iTunes',category:'بطاقات رقمية',price:10,stock:0,active:true},
-{id:5,name:'اشتراك Spotify Premium',category:'اشتراكات',price:3.5,stock:0,active:true},
-{id:6,name:'اشتراك Netflix Premium',category:'اشتراكات',price:4.5,stock:0,active:true}],
-orders:[{id:'MARO-DEMO-001',customer:'عميل تجريبي',email:'demo@example.com',product:'شحن PUBG Mobile',total:2.99,status:'pending',date:'2026-11-07'},{id:'MARO-DEMO-002',customer:'سارة — بيانات عرض',email:'',product:'بطاقة Steam Wallet',total:5,status:'paid',date:'2026-11-06'},{id:'MARO-DEMO-003',customer:'عميل عرض',email:'',product:'اشتراك Spotify Premium',total:3.5,status:'completed',date:'2026-11-05'}],categories:['ألعاب','إنترنت','اشتراكات','بطاقات رقمية']};
-const titles={overview:'نظرة عامة',orders:'الطلبات',products:'المنتجات',inventory:'الأكواد والمخزون',categories:'التصنيفات',reports:'تقارير المبيعات',settings:'إعدادات الموقع',users:'المستخدمون',verification:'طلبات التوثيق',centers:'مراكز المستخدمين',suppliers:'المزودون',supplierOrders:'طلبات المزود',manualOrders:'الطلبات اليدوية',shipping:'طلبات الشحن',paymentMethods:'طرق الدفع',paymentCategories:'أقسام الدفع',currencies:'العملات',suggestions:'اقتراحات المنتجات',notifications:'الإشعارات'};
-const modules={
-users:{desc:'استعراض حسابات العملاء والأرصدة وحالة الحساب.',cols:['المستخدم','البريد الإلكتروني','الرصيد','الحالة'],action:'إضافة مستخدم',rows:[['مستخدم تجريبي','user@example.com','$0.00','نشط'],['حساب عرض 02','demo2@example.com','$0.00','نشط']]},
-verification:{desc:'مراجعة طلبات توثيق الحسابات قبل اعتمادها.',cols:['رقم الطلب','المستخدم','تاريخ الإرسال','الحالة'],action:'تحديث الطلبات',rows:[['VER-DEMO-01','مستخدم تجريبي','2026-11-09','قيد المراجعة'],['VER-DEMO-02','حساب عرض 02','2026-11-08','بانتظار المستندات']]},
-centers:{desc:'متابعة مراكز المستخدمين والأرصدة والحركة المرتبطة بها.',cols:['مركز المستخدم','المالك','الرصيد','الحالة'],action:'إضافة مركز',rows:[['مركز عرض أول','مستخدم تجريبي','$0.00','نشط'],['مركز عرض ثانٍ','حساب عرض 02','$0.00','معلّق']]},
-suppliers:{desc:'إدارة بيانات الموردين وحالة الربط بهم.',cols:['المزود','الخدمات','الحساب','الحالة'],action:'إضافة مزود',rows:[['مزود تجريبي A','أكواد ألعاب','غير مربوط','غير مهيأ'],['مزود تجريبي B','بطاقات رقمية','غير مربوط','غير مهيأ']]},
-supplierOrders:{desc:'متابعة الطلبات المرسلة إلى الموردين.',cols:['رقم الطلب','المزود','المنتج','الإجمالي','الحالة'],action:'طلب جديد',rows:[['SUP-DEMO-01','مزود تجريبي A','شحن PUBG Mobile','$0.00','تجريبي'],['SUP-DEMO-02','مزود تجريبي B','بطاقة Steam','$0.00','تجريبي']]},
-manualOrders:{desc:'تسجيل ومراجعة الطلبات التي أُدخلت يدويًا.',cols:['رقم الطلب','العميل','المنتج','القيمة','الحالة'],action:'إنشاء طلب يدوي',rows:[['MAN-DEMO-01','عميل تجريبي','شحن PUBG Mobile','$2.99','مسودة'],['MAN-DEMO-02','عميل عرض','اشتراك رقمي','$0.00','مسودة']]},
-shipping:{desc:'استعراض طلبات شحن الرصيد المقدمة من العملاء.',cols:['رقم الطلب','المستخدم','طريقة الشحن','القيمة','الحالة'],action:'مراجعة الطلبات',rows:[['WAL-DEMO-01','مستخدم تجريبي','PayPal','$10.00','بانتظار المراجعة'],['WAL-DEMO-02','حساب عرض 02','يدوي','$5.00','تجريبي']]},
-paymentMethods:{desc:'عرض طرق الدفع المتاحة وإعداداتها العامة.',cols:['طريقة الدفع','النوع','الحالة','ملاحظات'],action:'إضافة طريقة دفع',rows:[['PayPal','دفع إلكتروني','مهيأ حسب فحص الموقع','تحتاج اختبارًا فعليًا'],['تحويل يدوي','يدوي','غير مفعّل','بيانات عرض']]},
-paymentCategories:{desc:'تنظيم وسائل الدفع ضمن أقسام واضحة.',cols:['القسم','عدد الطرق','الحالة','الوصف'],action:'إضافة قسم',rows:[['الدفع الإلكتروني','1','نشط','وسائل دفع عبر الإنترنت'],['الدفع اليدوي','1','تجريبي','إثبات دفع يدوي']]},
-currencies:{desc:'قائمة العملات المستخدمة في عرض الأسعار والتحويل.',cols:['العملة','الرمز','سعر العرض','الحالة'],action:'إضافة عملة',rows:[['الدولار الأمريكي','USD','$1.00','أساسية'],['الليرة السورية','SYP','غير محدد','غير مفعّلة']]},
-suggestions:{desc:'اقتراحات منتجات يمكن مراجعتها قبل إضافتها للكتالوج.',cols:['المنتج المقترح','الفئة','مقدم الاقتراح','الحالة'],action:'اقتراح منتج',rows:[['بطاقة ألعاب جديدة','بطاقات رقمية','عميل تجريبي','قيد المراجعة'],['شحن لعبة أخرى','ألعاب','حساب عرض','قيد المراجعة']]},
-notifications:{desc:'رسائل وإشعارات إدارية للعملاء أو فريق المتجر.',cols:['عنوان الإشعار','الجمهور','تاريخ الإنشاء','الحالة'],action:'إنشاء إشعار',rows:[['إشعار تجريبي','كل المستخدمين','2026-11-09','مسودة'],['تحديث حالة الطلب','عميل محدد','2026-11-08','مسودة']]}
+const adminRate = new Map();
+
+const seedProducts = [
+  ['p1','اشتراك Netflix Premium','اشتراكات',4.50,'شهر كامل بجودة 4K','عرض خاص','https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=900&q=80'],
+  ['p2','شحن PUBG Mobile','ألعاب',2.99,'شحن شدات سريع وآمن','الأكثر طلباً','https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=80'],
+  ['p3','باقة ADSL شهرية','إنترنت',8.00,'إنترنت سريع بدون تعقيد','قيمة ممتازة','https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=900&q=80'],
+  ['p4','بطاقة Steam Wallet','ألعاب',5.00,'اختر القيمة التي تناسبك','جديد','https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80'],
+  ['p5','بطاقة iTunes','بطاقات رقمية',10.00,'للتطبيقات والألعاب والمحتوى','الأكثر مبيعاً','https://images.unsplash.com/photo-1607260554167-5f6b5e49f5f3?auto=format&fit=crop&w=900&q=80'],
+  ['p6','اشتراك Spotify Premium','اشتراكات',3.50,'موسيقى بلا إعلانات','مميز','https://images.unsplash.com/photo-1611339555312-e607c8352fd7?auto=format&fit=crop&w=900&q=80']
+];
+
+async function migrate() {
+  if (!pool) return;
+  const c = await pool.getConnection();
+  try {
+    await c.query(`CREATE TABLE IF NOT EXISTS nova_categories (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(120) NOT NULL UNIQUE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
+    await c.query(`CREATE TABLE IF NOT EXISTS nova_products (id VARCHAR(80) PRIMARY KEY, name VARCHAR(255) NOT NULL, category VARCHAR(120) NOT NULL, price DECIMAL(10,2) NOT NULL, description TEXT NOT NULL, tag VARCHAR(80), image TEXT, active BOOLEAN NOT NULL DEFAULT TRUE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, INDEX(category), INDEX(active))`);
+    await c.query(`CREATE TABLE IF NOT EXISTS nova_inventory_codes (id BIGINT AUTO_INCREMENT PRIMARY KEY, product_id VARCHAR(80) NOT NULL, code TEXT NOT NULL, status ENUM('available','reserved','sold') NOT NULL DEFAULT 'available', order_id VARCHAR(80) NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, sold_at TIMESTAMP NULL, INDEX(product_id,status), CONSTRAINT fk_code_product FOREIGN KEY(product_id) REFERENCES nova_products(id) ON DELETE CASCADE)`);
+    await c.query(`CREATE TABLE IF NOT EXISTS nova_orders (id VARCHAR(80) PRIMARY KEY, firebase_uid VARCHAR(160) NOT NULL, customer_email VARCHAR(255), customer_name VARCHAR(255), phone VARCHAR(80), note TEXT, total DECIMAL(10,2) NOT NULL, currency VARCHAR(8) NOT NULL DEFAULT 'USD', status ENUM('pending','paid','processing','completed','cancelled','failed') NOT NULL DEFAULT 'pending', payment_status VARCHAR(40) NOT NULL DEFAULT 'unpaid', paypal_order_id VARCHAR(120) NULL UNIQUE, paypal_capture_id VARCHAR(120) NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, INDEX(firebase_uid), INDEX(status))`);
+    await c.query(`CREATE TABLE IF NOT EXISTS nova_order_items (id BIGINT AUTO_INCREMENT PRIMARY KEY, order_id VARCHAR(80) NOT NULL, product_id VARCHAR(80) NOT NULL, product_name VARCHAR(255) NOT NULL, qty INT NOT NULL, unit_price DECIMAL(10,2) NOT NULL, CONSTRAINT fk_item_order FOREIGN KEY(order_id) REFERENCES nova_orders(id) ON DELETE CASCADE)`);
+    await c.query(`CREATE TABLE IF NOT EXISTS nova_order_codes (id BIGINT AUTO_INCREMENT PRIMARY KEY, order_id VARCHAR(80) NOT NULL, product_id VARCHAR(80) NOT NULL, code TEXT NOT NULL, CONSTRAINT fk_order_code_order FOREIGN KEY(order_id) REFERENCES nova_orders(id) ON DELETE CASCADE)`);
+    await c.query(`CREATE TABLE IF NOT EXISTS nova_admin_records (id BIGINT AUTO_INCREMENT PRIMARY KEY, resource VARCHAR(40) NOT NULL, title VARCHAR(255) NOT NULL, status VARCHAR(40) NOT NULL DEFAULT 'draft', amount DECIMAL(12,2) NULL, details TEXT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, INDEX(resource,created_at), INDEX(resource,status))`);
+    
+    for (const name of ['ألعاب','اشتراكات','إنترنت','بطاقات رقمية']) {
+        await c.query('INSERT IGNORE INTO nova_categories (name) VALUES (?)',[name]);
+    }
+    
+    const [count] = await c.query('SELECT COUNT(*) n FROM nova_products');
+    if (!Number(count[0].n)) {
+        for (const p of seedProducts) {
+            await c.query('INSERT INTO nova_products (id,name,category,price,description,tag,image) VALUES (?,?,?,?,?,?,?)',p);
+        }
+    }
+    console.log("✅ Database migration successful.");
+  } finally { c.release(); }
+}
+
+function origin(req) {
+  const proto = String(req.headers['x-forwarded-proto'] || req.protocol || 'http').split(',')[0].trim().toLowerCase();
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+  try {
+    const value = new URL(`${proto === 'https' || req.secure ? 'https' : 'http'}://${host}`);
+    if (!value.hostname || value.username || value.password) throw new Error('invalid origin');
+    return value.origin;
+  } catch {
+    return String(process.env.PUBLIC_APP_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
+  }
+}
+
+app.disable('x-powered-by');
+app.use((req,res,next)=>{res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');next()});
+
+async function authUser(req, res, next) {
+  const header = req.headers.authorization || '';
+  if (!header.startsWith('Bearer ')) return res.status(401).json({ error: 'تسجيل الدخول مطلوب.' });
+  try {
+    const { payload } = await jwtVerify(header.slice(7), firebaseKeys, { issuer: `https://securetoken.google.com/${PROJECT_ID}`, audience: PROJECT_ID });
+    req.user = { uid: payload.user_id || payload.sub, email: String(payload.email || '').trim().toLowerCase(), emailVerified: payload.email_verified === true };
+    next();
+  } catch { res.status(401).json({ error: 'جلسة الدخول غير صالحة أو منتهية.' }); }
+}
+
+function adminUser(req, res, next) {
+  authUser(req, res, () => {
+    next();
+  });
+}
+
+async function paypalToken() {
+  const clientId = String(process.env.PAYPAL_CLIENT_ID || '').trim().replace(/^['"]|['"]$/g,'');
+  const clientSecret = String(process.env.PAYPAL_CLIENT_SECRET || '').trim().replace(/^['"]|['"]$/g,'');
+  const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+  const r = await fetch(`${PAYPAL_API}/v1/oauth2/token`, { method:'POST', headers:{ Authorization:`Basic ${auth}`, 'Content-Type':'application/x-www-form-urlencoded' }, body:'grant_type=client_credentials' });
+  if (!r.ok) throw new Error(`PayPal token failed ${r.status}`);
+  return (await r.json()).access_token;
+}
+
+async function paypal(pathname, options={}) {
+  const token = await paypalToken();
+  const r = await fetch(`${PAYPAL_API}${pathname}`, { ...options, headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json', ...(options.headers||{}) } });
+  const text = await r.text(); let data; try { data=JSON.parse(text); } catch { data={raw:text}; }
+  if (!r.ok) { const e=new Error(data.message || 'PayPal request failed'); e.details=data; throw e; }
+  return data;
+}
+
+function orderId(){ return `MARO-${Date.now()}-${Math.random().toString(36).slice(2,7).toUpperCase()}`; }
+
+app.use(express.json({ limit:'1mb' }));
+
+// Middleware to check DB availability
+const checkDb = (req, res, next) => {
+    if (!pool) return res.status(500).json({error: 'قاعدة البيانات غير متصلة حالياً.'});
+    next();
 };
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-let data;try{data=JSON.parse(localStorage.getItem('maro_admin_demo_v1'))||structuredClone(seed)}catch{data=JSON.parse(JSON.stringify(seed))}
-const save=()=>localStorage.setItem('maro_admin_demo_v1',JSON.stringify(data));
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money=n=>'$'+Number(n||0).toFixed(2);
-const statusText={pending:'معلّق',paid:'مدفوع',processing:'قيد المعالجة',completed:'مكتمل',cancelled:'ملغي',failed:'فشل'};
-const pill=s=>`<span class="status-pill st-${esc(s)}">${statusText[s]||esc(s)}</span>`;
-let toastTimer;
-function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300)}
-function page(id){if(!titles[id])return;$$('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+id));$$('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));$('#topTitle').textContent=titles[id];$('#sidebar').classList.remove('open');$('#overlay').classList.remove('show');renderAll()}
-function modal(title,body,submitLabel,handler){$('#modal').innerHTML=`<div class="modal-head"><h3>${title}</h3><button class="close" type="button" aria-label="إغلاق">×</button></div>${body}<div class="modal-actions"><button class="btn primary" id="modalSubmit">${submitLabel}</button><button class="btn" id="modalCancel">إلغاء</button></div>`;$('#modalBackdrop').classList.add('open');$('#modal .close').onclick=closeModal;$('#modalCancel').onclick=closeModal;$('#modalSubmit').onclick=()=>handler($('#modal'))}
-function closeModal(){$('#modalBackdrop').classList.remove('open');$('#modal').innerHTML=''}
-function addProduct(p=null){const editing=!!p;modal(editing?'تعديل المنتج':'إضافة منتج',`<div class="form-grid"><div class="field wide"><label>اسم المنتج</label><input id="fName" value="${esc(p?.name||'')}" placeholder="مثال: بطاقة ألعاب رقمية"></div><div class="field"><label>التصنيف</label><select id="fCategory">${data.categories.map(c=>`<option ${p?.category===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div><div class="field"><label>السعر بالدولار</label><input id="fPrice" type="number" min="0" step="0.01" value="${p?.price??''}" placeholder="0.00"></div><div class="field"><label>المخزون الابتدائي</label><input id="fStock" type="number" min="0" step="1" value="${p?.stock??0}"></div><div class="field"><label>الحالة</label><select id="fActive"><option value="1" ${p?.active!==false?'selected':''}>نشط</option><option value="0" ${p?.active===false?'selected':''}>مخفي</option></select></div></div>`,editing?'حفظ التغييرات':'إضافة المنتج',m=>{const name=m.querySelector('#fName').value.trim(),price=Number(m.querySelector('#fPrice').value),stock=Math.max(0,Number(m.querySelector('#fStock').value)||0);if(!name||!Number.isFinite(price)||price<0){toast('أدخل اسمًا وسعرًا صحيحين');return}const obj={name,category:m.querySelector('#fCategory').value,price,stock,active:m.querySelector('#fActive').value==='1'};if(editing)Object.assign(p,obj);else data.products.unshift({id:Date.now(),...obj});save();closeModal();renderAll();toast(editing?'تم تحديث المنتج في بيانات العرض':'تمت إضافة المنتج إلى بيانات العرض')})}
-function addCodes(p){modal('إضافة أكواد للمخزون',`<p style="font-size:11px;color:var(--muted);margin:5px 0 10px">المنتج: <b>${esc(p.name)}</b> · الحالي: ${p.stock} كود</p><div class="field"><label>عدد الأكواد المراد إضافتها</label><input id="codesCount" type="number" min="1" value="1"></div><div class="field" style="margin-top:10px"><label>ملاحظة (اختياري)</label><textarea id="codesNote" placeholder="مثال: أضيفت دفعة جديدة للمخزون"></textarea></div><p style="font-size:9px;color:var(--red);margin:8px 0 0">هذا النموذج يزيد عدّادًا تجريبيًا فقط؛ لا يحفظ الأكواد السرية الفعلية.</p>`, 'إضافة للمخزون',m=>{const n=Math.floor(Number(m.querySelector('#codesCount').value));if(!Number.isFinite(n)||n<1){toast('أدخل عددًا صحيحًا');return}p.stock+=n;save();closeModal();renderAll();toast(`أضيف ${n} إلى مخزون العرض`)})}
-function addCategory(){modal('إضافة تصنيف',`<div class="field" style="margin-top:13px"><label>اسم التصنيف</label><input id="catName" placeholder="مثال: بطاقات رقمية"></div>`,'إضافة التصنيف',m=>{const name=m.querySelector('#catName').value.trim();if(!name){toast('اكتب اسم التصنيف');return}if(data.categories.includes(name)){toast('هذا التصنيف موجود');return}data.categories.push(name);save();closeModal();renderAll();toast('تمت إضافة التصنيف')})}
-function setOrderStatus(order,s){order.status=s;save();renderAll();toast('تم تحديث الحالة في بيانات العرض')}
-function exportCSV(rows,name){const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-function orderRows(items,showActions=false){return items.map(o=>`<tr><td><strong>${esc(o.id)}</strong></td><td>${esc(o.customer)}<small>${esc(o.email||'—')}</small></td><td>${esc(o.product)}</td><td><strong>${money(o.total)}</strong></td><td>${pill(o.status)}</td><td>${esc(o.date)}</td>${showActions?`<td><select class="select order-status" data-id="${esc(o.id)}" aria-label="تغيير الحالة">${Object.entries(statusText).map(([k,v])=>`<option value="${k}" ${o.status===k?'selected':''}>${v}</option>`).join('')}</select></td>`:''}</tr>`).join('')||`<tr><td colspan="${showActions?7:6}" class="empty">لا توجد نتائج مطابقة.</td></tr>`}
-function renderOverview(){
-const paid=data.orders.filter(o=>['paid','processing','completed'].includes(o.status)).reduce((s,o)=>s+Number(o.total),0),pending=data.orders.filter(o=>o.status==='pending').length,stock=data.products.reduce((s,p)=>s+Number(p.stock),0);
-const stats=[['قيمة الطلبات المدفوعة',money(paid),'↗','المبالغ المدفوعة فقط','◈'],['إجمالي الطلبات',data.orders.length,'▤',pending+' معلّق للمتابعة','▤'],['المنتجات النشطة',data.products.filter(p=>p.active).length,'＋','ضمن الكتالوج','▣'],['الأكواد المتاحة',stock,'✓',stock?'جاهزة للعرض':'المخزون التجريبي فارغ','◇']];
-$('#stats').innerHTML=stats.map(x=>`<div class="stat"><div class="stat-top"><span class="stat-label">${x[0]}</span><span class="stat-icon">${x[4]}</span></div><strong>${x[1]}</strong><div class="stat-foot"><b class="${x[2]==='✓'&&stock===0?'warn':'up'}">${x[2]}</b> ${x[3]}</div></div>`).join('');
-const counts=['pending','paid','processing','completed','cancelled'].map(s=>[s,data.orders.filter(o=>o.status===s).length]);
-$('#statusList').innerHTML=counts.map(([s,n])=>`<div class="status-row"><span class="status-name"><i class="status-dot ${s==='paid'||s==='completed'?'green':s==='processing'?'blue':s==='cancelled'?'red':''}"></i>${statusText[s]}</span><strong>${n}</strong></div>`).join('');
-const vals=[22,43,31,68,45,80,54],days=['الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد','الاثنين'];
-$('#chart').innerHTML=vals.map((v,i)=>`<div class="bar-col"><div class="bar" style="height:${v}%"></div><small>${days[i]}</small></div>`).join('');
-$('#recentOrders').innerHTML=orderRows(data.orders.slice(0,4),false);
-const pendingBadge = $('#pendingBadge'); if(pendingBadge) pendingBadge.textContent=pending;
-}
-function renderOrders(){const q=($('#orderSearch')?.value||'').toLowerCase(),f=$('#orderFilter')?.value||'all';const list=data.orders.filter(o=>(f==='all'||o.status===f)&&(`${o.id} ${o.customer} ${o.email} ${o.product}`).toLowerCase().includes(q));$('#ordersBody').innerHTML=orderRows(list,true);$('#orderCount').textContent=`${list.length} طلب`;$$('.order-status').forEach(s=>s.onchange=()=>{const o=data.orders.find(x=>String(x.id)===s.dataset.id);if(o)setOrderStatus(o,s.value)})}
-function renderProducts(){const q=($('#productSearch')?.value||'').toLowerCase(),f=$('#productFilter')?.value||'all';const list=data.products.filter(p=>(f==='all'||(f==='active'?p.active:!p.active))&&(`${p.name} ${p.category}`).toLowerCase().includes(q));$('#productsBody').innerHTML=list.map(p=>`<tr><td><strong>${esc(p.name)}</strong></td><td>${esc(p.category)}</td><td>${money(p.price)}</td><td><span class="stock-bar"><i style="width:${Math.min(100,p.stock*10)}%"></i></span> ${p.stock}</td><td>${p.active?'<span class="status-pill st-active">نشط</span>':'<span class="status-pill st-hidden">مخفي</span>'}</td><td><div class="inline-actions"><button class="btn small" data-edit="${p.id}">تعديل</button><button class="btn small" data-stock="${p.id}">أكواد</button><button class="btn small" data-toggle="${p.id}">${p.active?'إخفاء':'إظهار'}</button><button class="btn small danger" data-delete="${p.id}">حذف</button></div></td></tr>`).join('')||'<tr><td colspan="6" class="empty">لا توجد منتجات مطابقة.</td></tr>';$('#productCount').textContent=`${list.length} منتج`;
-$$('[data-edit]').forEach(b=>b.onclick=()=>addProduct(data.products.find(p=>p.id==b.dataset.edit)));$$('[data-stock]').forEach(b=>b.onclick=()=>addCodes(data.products.find(p=>p.id==b.dataset.stock)));$$('[data-toggle]').forEach(b=>b.onclick=()=>{const p=data.products.find(x=>x.id==b.dataset.toggle);p.active=!p.active;save();renderAll();toast('تم تحديث حالة المنتج')});$$('[data-delete]').forEach(b=>b.onclick=()=>{const p=data.products.find(x=>x.id==b.dataset.delete);if(confirm(`حذف ${p.name} من بيانات العرض المحلية؟`)){data.products=data.products.filter(x=>x.id!==p.id);save();renderAll();toast('تم حذف المنتج من بيانات العرض')}})}
-function renderInventory(){const stock=data.products.reduce((s,p)=>s+p.stock,0);$('#inventoryStats').innerHTML=[['إجمالي الأكواد المتاحة',stock,'▦'],['منتجات تحتاج تعبئة',data.products.filter(p=>p.stock===0).length,'!'],['منتجات في الكتالوج',data.products.length,'▣'],['تصنيفات',data.categories.length,'◫']].map(x=>`<div class="stat"><div class="stat-top"><span class="stat-label">${x[0]}</span><span class="stat-icon">${x[2]}</span></div><strong>${x[1]}</strong></div>`).join('');const q=($('#inventorySearch')?.value||'').toLowerCase();const list=data.products.filter(p=>(p.name+' '+p.category).toLowerCase().includes(q));$('#inventoryBody').innerHTML=list.map(p=>`<tr><td><strong>${esc(p.name)}</strong></td><td>${esc(p.category)}</td><td>${money(p.price)}</td><td><span class="stock-bar"><i style="width:${Math.min(100,p.stock*10)}%"></i></span> ${p.stock} كود</td><td>${p.stock?'<span class="status-pill st-active">متوفر</span>':'<span class="status-pill st-pending">نفد المخزون</span>'}</td><td><button class="btn small blue" data-addstock="${p.id}">＋ إضافة للمخزون</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">لا توجد منتجات.</td></tr>';$$('[data-addstock]').forEach(b=>b.onclick=()=>addCodes(data.products.find(p=>p.id==b.dataset.addstock)))}
-function renderCategories(){$('#categoryGrid').innerHTML=data.categories.map(c=>`<div class="category-card"><div><h3>${esc(c)}</h3><p>${data.products.filter(p=>p.category===c).length} منتج ضمن الفئة</p></div><div class="inline-actions"><span class="category-count">${data.products.filter(p=>p.category===c).length} منتجات</span><button class="btn small danger" data-delcat="${esc(c)}">حذف</button></div></div>`).join('')||'<div class="card empty">لا توجد تصنيفات.</div>';$$('[data-delcat]').forEach(b=>b.onclick=()=>{const c=b.dataset.delcat;if(data.products.some(p=>p.category===c)){toast('انقل منتجات التصنيف أولًا');return}if(confirm(`حذف تصنيف ${c} من بيانات العرض؟`)){data.categories=data.categories.filter(x=>x!==c);save();renderAll();toast('تم حذف التصنيف')}})}
-function renderReports(){const gross=data.orders.reduce((s,o)=>s+Number(o.total),0),paid=data.orders.filter(o=>['paid','processing','completed'].includes(o.status)).reduce((s,o)=>s+Number(o.total),0),paidN=data.orders.filter(o=>['paid','processing','completed'].includes(o.status)).length,completed=data.orders.filter(o=>o.status==='completed').length,stock=data.products.reduce((s,p)=>s+p.stock,0);const cards=[['قيمة جميع الطلبات',money(gross)],['المبيعات المدفوعة',money(paid)],['متوسط الطلب',money(data.orders.length?gross/data.orders.length:0)],['عدد الطلبات المدفوعة',paidN],['طلبات مكتملة',completed],['أكواد متاحة',stock]];$('#reportGrid').innerHTML=cards.map(x=>`<div class="report-card"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join('');$('#reportNotes').innerHTML=`<div class="status-row"><span class="status-name"><i class="status-dot green"></i>المبيعات المدفوعة</span><strong>${money(paid)}</strong></div><div class="status-row"><span class="status-name"><i class="status-dot"></i>طلبات غير مدفوعة أو قيد المتابعة</span><strong>${money(data.orders.filter(o=>o.status==='pending').reduce((s,o)=>s+Number(o.total),0))}</strong></div><div style="color:var(--muted);font-size:9px;margin-top:4px">الأرقام أعلاه تجريبية ومحفوظة محليًا، وليست تقارير فعلية من قاعدة بيانات المتجر.</div>`}
-function mountModules(){const host=$('.content');Object.entries(modules).forEach(([id,m])=>{host.insertAdjacentHTML('beforeend',`<section class="page" id="page-${id}"><div class="page-head"><div><h2>${m.title}</h2><p>${m.desc}</p></div><div class="actions"><button class="btn" data-module-action="${id}">＋ ${m.action}</button></div></div><div class="card"><div class="toolbar"><div class="filters"><label class="filter-search">⌕ <input data-module-search="${id}" placeholder="ابحث في ${m.title}"></label></div><span class="category-count">بيانات تجريبية</span></div><div class="notice" style="margin-bottom:12px">هذه بيانات توضيحية فقط. هذا القسم غير مربوط بنظام مستخدمين أو مزودين أو مدفوعات حقيقي.</div><div class="table-wrap"><table class="table"><thead><tr>${m.cols.map(c=>`<th>${c}</th>`).join('')}<th>إجراء</th></tr></thead><tbody id="module-body-${id}"></tbody></table></div></div></section>`)});}
-function renderModules(){Object.entries(modules).forEach(([id,m])=>{const q=$(`[data-module-search="${id}"]`)?.value?.toLowerCase()||'',rows=m.rows.filter(r=>r.join(' ').toLowerCase().includes(q));$(`#module-body-${id}`).innerHTML=rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}<td><button class="btn small" data-module-view="${id}">استعراض</button></td></tr>`).join('')||`<tr><td colspan="${m.cols.length+1}" class="empty">لا توجد نتائج مطابقة.</td></tr>`});$$('[data-module-action]').forEach(b=>b.onclick=()=>toast('هذا الإجراء يحتاج ربطًا بالنظام الخلفي'));$$('[data-module-view]').forEach(b=>b.onclick=()=>toast('هذا سجل توضيحي، لا توجد بيانات فعلية لعرضها'));}
-function renderAll(){renderOverview();renderOrders();renderProducts();renderInventory();renderCategories();renderReports();renderModules()}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(b)page(b.dataset.page)});$$('[data-action="add-product"]').forEach(b=>b.addEventListener('click',()=>addProduct()));$('#addCategory').onclick=addCategory;
-$('#orderSearch').oninput=renderOrders;$('#orderFilter').onchange=renderOrders;$('#productSearch').oninput=renderProducts;$('#productFilter').onchange=renderProducts;$('#inventorySearch').oninput=renderInventory;document.addEventListener('input',e=>{if(e.target.matches('[data-module-search]'))renderModules()});
-$('#exportOrders').onclick=()=>exportCSV([['رقم الطلب','العميل','البريد','المنتج','الإجمالي','الحالة','التاريخ'],...data.orders.map(o=>[o.id,o.customer,o.email,o.product,o.total,statusText[o.status],o.date])],'maro-orders-demo.csv');$('#exportReport').onclick=()=>exportCSV([['المؤشر','القيمة'],['عدد الطلبات',data.orders.length],['قيمة الطلبات',data.orders.reduce((s,o)=>s+Number(o.total),0)],['مخزون الأكواد',data.products.reduce((s,p)=>s+p.stock,0)]],'maro-report-demo.csv');
-$('#menuBtn').onclick=()=>{$('#sidebar').classList.add('open');$('#overlay').classList.add('show')};$('#overlay').onclick=()=>{$('#sidebar').classList.remove('open');$('#overlay').classList.remove('show')};
-function setTheme(d){document.body.classList.toggle('dark',d);localStorage.setItem('maro_admin_theme',d?'dark':'light')};setTheme(localStorage.getItem('maro_admin_theme')!=='light');$('#themeBtn').onclick=()=>setTheme(!document.body.classList.contains('dark'));$('#settingsTheme').onclick=()=>setTheme(!document.body.classList.contains('dark'));
-$('#refreshBtn').onclick=()=>{renderAll();toast('تم تحديث بيانات العرض')};$('#storeBtn').onclick=()=>window.open('https://newwwww-quit.onrender.com/','_blank','noopener');$('#globalSearch').onkeydown=e=>{if(e.key==='Enter'){const v=e.target.value.trim();$('#productSearch').value=v;page('products');$('#productSearch').value=v;renderProducts()}};
-$('#chartPeriod').onchange=()=>toast('الرسم توضيحي لبيانات العرض');$('#modalBackdrop').addEventListener('click',e=>{if(e.target===$('#modalBackdrop'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
-const authReady=setPersistence(auth,browserLocalPersistence).catch(()=>{});
+app.get('/api/health', async (_req,res)=>{ if(!pool) return res.json({ok:false, database:false}); try { await pool.query('SELECT 1'); res.json({ok:true,database:true,paypal:Boolean(process.env.PAYPAL_CLIENT_ID&&process.env.PAYPAL_CLIENT_SECRET)}); } catch { res.status(503).json({ok:false,database:false}); } });
+app.get('/api/categories', checkDb, async (_req,res)=>{ const [rows]=await pool.query('SELECT name FROM nova_categories ORDER BY name'); res.json(rows.map(x=>x.name)); });
+app.get('/api/products', checkDb, async (_req,res)=>{ const [rows]=await pool.query(`SELECT p.*, (SELECT COUNT(*) FROM nova_inventory_codes c WHERE c.product_id=p.id AND c.status='available') AS available_codes FROM nova_products p WHERE p.active=1 ORDER BY p.created_at DESC`); res.json(rows); });
+app.get('/api/admin/products', checkDb, adminUser, async (_req,res)=>{ const [rows]=await pool.query(`SELECT p.*, (SELECT COUNT(*) FROM nova_inventory_codes c WHERE c.product_id=p.id AND c.status='available') AS available_codes FROM nova_products p ORDER BY p.created_at DESC`); res.json(rows); });
+app.post('/api/admin/products', checkDb, adminUser, async (req,res)=>{ const body=req.body||{}; const {id,name,category,price,description,tag,image}=body; if(!String(name||'').trim()||!String(category||'').trim()||!Number.isFinite(Number(price))||Number(price)<0) return res.status(400).json({error:'بيانات المنتج ناقصة أو غير صحيحة.'}); const productId=id||`p-${Date.now()}`; const active=body.active===false||body.active===0||body.active==='0'?0:1; await pool.query(`INSERT INTO nova_products (id,name,category,price,description,tag,image,active) VALUES (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name),category=VALUES(category),price=VALUES(price),description=VALUES(description),tag=VALUES(tag),image=VALUES(image),active=VALUES(active)`,[productId,String(name).trim(),String(category).trim(),Number(price),description||'',tag||'جديد',image||'',active]); res.json({ok:true,id:productId}); });
+app.post('/api/admin/import-product', checkDb, adminUser, async (req,res)=>{ try { const raw=String(req.body?.url||'').trim(); const u=new URL(raw); if(!['http:','https:'].includes(u.protocol)) return res.status(400).json({error:'استخدم رابط HTTPS أو HTTP صحيح.'}); if(['localhost','127.0.0.1','0.0.0.0','::1'].includes(u.hostname)||/^10\.|^192\.168\.|^172\.(1[6-9]|2\d|3[0-1])\./.test(u.hostname)) return res.status(400).json({error:'هذا الرابط غير مسموح لأسباب أمنية.'}); const controller=new AbortController(); const timer=setTimeout(()=>controller.abort(),8000); const r=await fetch(u,{headers:{'User-Agent':'MaroStoreProductImporter/1.0'},signal:controller.signal,redirect:'follow'}); clearTimeout(timer); if(!r.ok)return res.status(400).json({error:'تعذر قراءة صفحة المنتج.'}); const html=(await r.text()).slice(0,1200000); const meta=(name)=>{const re=new RegExp(`<meta[^>]+(?:property|name)=["']${name}["'][^>]+content=["']([^"']*)["']|<meta[^>]+content=["']([^"']*)["'][^>]+(?:property|name)=["']${name}["']`,'i');const m=html.match(re);return m?.[1]||m?.[2]||''}; const clean=x=>String(x||'').replace(/&amp;/g,'&').replace(/&#39;/g,"'").replace(/&quot;/g,'"').replace(/<[^>]+>/g,'').trim(); const title=clean(meta('og:title')||meta('twitter:title')||(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]); const description=clean(meta('og:description')||meta('description')); const image=meta('og:image')||meta('twitter:image'); const priceMatch=html.match(/(?:"price"|itemprop=["']price["'])\s*[:=]\s*["']?([0-9]+(?:[.,][0-9]{1,2})?)/i); res.json({ok:true,data:{name:title.slice(0,255),description:description.slice(0,500),image:image.slice(0,1000),price:priceMatch?Number(priceMatch[1].replace(',','.')):0,tag:'مستورد'}}); } catch(e){res.status(400).json({error:e.name==='AbortError'?'انتهت مهلة قراءة الرابط.':'الرابط غير صالح أو لا يمكن قراءته.'});} });
+app.patch('/api/admin/products/:id', checkDb, adminUser, async (req,res)=>{ const body=req.body||{}; if(Object.prototype.hasOwnProperty.call(body,'active')){ await pool.query('UPDATE nova_products SET active=? WHERE id=?',[Boolean(body.active),req.params.id]); } const fields=['name','category','price','description','tag','image']; const updates=[],values=[]; for(const field of fields){ if(Object.prototype.hasOwnProperty.call(body,field)){ if(['name','category'].includes(field)&&!String(body[field]||'').trim()) return res.status(400).json({error:'اسم المنتج والتصنيف مطلوبان.'}); if(field==='price'&&!Number.isFinite(Number(body[field]))) return res.status(400).json({error:'السعر غير صحيح.'}); updates.push(`${field}=?`); values.push(field==='price'?Number(body[field]):String(body[field]||'')); } } if(updates.length){ values.push(req.params.id); await pool.query(`UPDATE nova_products SET ${updates.join(',')} WHERE id=?`,values); } res.json({ok:true}); });
+app.delete('/api/admin/products/:id', checkDb, adminUser, async (req,res)=>{ await pool.query('DELETE FROM nova_products WHERE id=?',[req.params.id]); res.json({ok:true}); });
+app.post('/api/admin/categories', checkDb, adminUser, async (req,res)=>{ const name=String(req.body?.name||'').trim(); if(!name) return res.status(400).json({error:'اسم التصنيف مطلوب.'}); await pool.query('INSERT IGNORE INTO nova_categories (name) VALUES (?)',[name]); res.json({ok:true}); });
+app.delete('/api/admin/categories/:name', checkDb, adminUser, async (req,res)=>{ const name=String(req.params.name||'').trim(); if(!name) return res.status(400).json({error:'اسم التصنيف مطلوب.'}); const [used]=await pool.query('SELECT COUNT(*) AS n FROM nova_products WHERE category=?',[name]); if(Number(used[0]?.n||0)>0) return res.status(409).json({error:'لا يمكن حذف تصنيف مرتبط بمنتجات.'}); await pool.query('DELETE FROM nova_categories WHERE name=?',[name]); res.json({ok:true}); });
+app.post('/api/admin/products/:id/codes', checkDb, adminUser, async (req,res)=>{ const raw=String(req.body?.codes||''); const codes=[...new Set(raw.split(/\r?\n|,|;/).map(x=>x.trim()).filter(Boolean))]; if(!codes.length) return res.status(400).json({error:'لم يتم العثور على أكواد.'}); const [p]=await pool.query('SELECT id FROM nova_products WHERE id=?',[req.params.id]); if(!p.length) return res.status(404).json({error:'المنتج غير موجود.'}); const c=await pool.getConnection(); try { await c.beginTransaction(); for(const code of codes) await c.query('INSERT INTO nova_inventory_codes (product_id,code) VALUES (?,?)',[req.params.id,code]); await c.commit(); res.json({ok:true,added:codes.length}); } catch(e){ await c.rollback(); throw e; } finally { c.release(); } });
+app.get('/api/admin/orders', checkDb, adminUser, async (_req,res)=>{ const [rows]=await pool.query('SELECT * FROM nova_orders ORDER BY created_at DESC'); for(const row of rows){ const [items]=await pool.query('SELECT product_id AS id,product_name AS name,qty,unit_price AS price FROM nova_order_items WHERE order_id=?',[row.id]); const [codes]=await pool.query('SELECT product_id,code FROM nova_order_codes WHERE order_id=?',[row.id]); row.items=items; row.codes=codes; } res.json(rows); });
+app.patch('/api/admin/orders/:id', checkDb, adminUser, async (req,res)=>{ const allowed=new Set(['pending','paid','processing','completed','cancelled','failed']); const status=String(req.body?.status||''); if(!allowed.has(status)) return res.status(400).json({error:'حالة الطلب غير صحيحة.'}); await pool.query('UPDATE nova_orders SET status=? WHERE id=?',[status,req.params.id]); res.json({ok:true}); });
 
-$('#loginForm').addEventListener('submit',async e=>{
-    e.preventDefault();
-    const button=$('#loginSubmit'),email=$('#loginEmail').value.trim(),password=$('#loginPassword').value;
-    button.disabled=true;
-    button.textContent='جارٍ التحقق...';
-    showLogin('');
-    try{
-        await authReady;
-        await signInWithEmailAndPassword(auth,email,password);
-        $('#loginPassword').value='';
-    }catch(error){
-        $('#loginPassword').value='';
-        showLogin(authErrorText(error.code));
-    }finally{
-        button.disabled=false;
-        button.textContent='دخول آمن إلى اللوحة';
+const adminRecordResources=new Set(['verification','centers','suppliers','supplierOrders','manualOrders','shipping','paymentMethods','paymentCategories','currencies','suggestions','notifications']);
+const adminRecordStatuses=new Set(['draft','pending','review','approved','rejected','active','inactive','processing','completed','cancelled','sent']);
+app.get('/api/admin/users',checkDb,adminUser,async (_req,res)=>{ const [rows]=await pool.query(`SELECT firebase_uid AS id,COALESCE(MAX(NULLIF(customer_name,'')),MAX(customer_email),'عميل') AS name,MAX(customer_email) AS email,COUNT(*) AS orders_count,SUM(CASE WHEN payment_status='paid' THEN total ELSE 0 END) AS paid_total,MAX(created_at) AS last_order FROM nova_orders GROUP BY firebase_uid ORDER BY last_order DESC LIMIT 500`); res.json(rows); });
+app.get('/api/admin/records/:resource',checkDb,adminUser,async (req,res)=>{ const resource=String(req.params.resource||''); if(!adminRecordResources.has(resource)) return res.status(404).json({error:'قسم الإدارة غير معروف.'}); const [rows]=await pool.query('SELECT id,title,status,amount,details,created_at,updated_at FROM nova_admin_records WHERE resource=? ORDER BY created_at DESC LIMIT 500',[resource]); res.json(rows); });
+app.post('/api/admin/records/:resource',checkDb,adminUser,async (req,res)=>{ const resource=String(req.params.resource||''); if(!adminRecordResources.has(resource)) return res.status(404).json({error:'قسم الإدارة غير معروف.'}); const body=req.body||{},title=String(body.title||'').trim(),status=String(body.status||'draft'),details=String(body.details||'').trim(); const amount=body.amount===null||body.amount===''||body.amount===undefined?null:Number(body.amount); if(!title||title.length>255) return res.status(400).json({error:'أدخل عنوانًا من 1 إلى 255 حرفًا.'}); if(!adminRecordStatuses.has(status)) return res.status(400).json({error:'حالة السجل غير صحيحة.'}); if(amount!==null&&(!Number.isFinite(amount)||amount<0)) return res.status(400).json({error:'القيمة المالية غير صحيحة.'}); if(details.length>10000) return res.status(400).json({error:'التفاصيل أطول من الحد المسموح.'}); const [result]=await pool.query('INSERT INTO nova_admin_records (resource,title,status,amount,details) VALUES (?,?,?,?,?)',[resource,title,status,amount,details]); const [rows]=await pool.query('SELECT id,title,status,amount,details,created_at,updated_at FROM nova_admin_records WHERE id=?',[result.insertId]); res.status(201).json(rows[0]); });
+app.patch('/api/admin/records/:resource/:id',checkDb,adminUser,async (req,res)=>{ const resource=String(req.params.resource||''),id=Number(req.params.id); if(!adminRecordResources.has(resource)) return res.status(404).json({error:'قسم الإدارة غير معروف.'}); if(!Number.isSafeInteger(id)||id<1) return res.status(400).json({error:'رقم السجل غير صحيح.'}); const [exists]=await pool.query('SELECT id FROM nova_admin_records WHERE resource=? AND id=?',[resource,id]); if(!exists.length) return res.status(404).json({error:'السجل غير موجود.'}); const body=req.body||{},sets=[],values=[]; if(Object.hasOwn(body,'title')){const title=String(body.title||'').trim();if(!title||title.length>255)return res.status(400).json({error:'العنوان غير صحيح.'});sets.push('title=?');values.push(title)} if(Object.hasOwn(body,'status')){const status=String(body.status||'');if(!adminRecordStatuses.has(status))return res.status(400).json({error:'حالة السجل غير صحيحة.'});sets.push('status=?');values.push(status)} if(Object.hasOwn(body,'amount')){const amount=body.amount===null||body.amount===''?null:Number(body.amount);if(amount!==null&&(!Number.isFinite(amount)||amount<0))return res.status(400).json({error:'القيمة المالية غير صحيحة.'});sets.push('amount=?');values.push(amount)} if(Object.hasOwn(body,'details')){const details=String(body.details||'').trim();if(details.length>10000)return res.status(400).json({error:'التفاصيل أطول من الحد المسموح.'});sets.push('details=?');values.push(details)} if(!sets.length)return res.status(400).json({error:'لا توجد حقول لتحديثها.'}); values.push(resource,id); await pool.query(`UPDATE nova_admin_records SET ${sets.join(',')} WHERE resource=? AND id=?`,values); const [rows]=await pool.query('SELECT id,title,status,amount,details,created_at,updated_at FROM nova_admin_records WHERE resource=? AND id=?',[resource,id]); res.json(rows[0]); });
+app.delete('/api/admin/records/:resource/:id',checkDb,adminUser,async (req,res)=>{ const resource=String(req.params.resource||''),id=Number(req.params.id); if(!adminRecordResources.has(resource)) return res.status(404).json({error:'قسم الإدارة غير معروف.'}); if(!Number.isSafeInteger(id)||id<1) return res.status(400).json({error:'رقم السجل غير صحيح.'}); const [result]=await pool.query('DELETE FROM nova_admin_records WHERE resource=? AND id=?',[resource,id]); if(!result.affectedRows)return res.status(404).json({error:'السجل غير موجود.'}); res.json({ok:true}); });
+app.get('/api/admin/dashboard-data',checkDb,adminUser,async (_req,res)=>{ const [products]=await pool.query(`SELECT p.*, (SELECT COUNT(*) FROM nova_inventory_codes c WHERE c.product_id=p.id AND c.status='available') AS available_codes FROM nova_products p ORDER BY p.created_at DESC`); const [orders]=await pool.query('SELECT * FROM nova_orders ORDER BY created_at DESC LIMIT 500'); if(orders.length){const ids=orders.map(o=>o.id),marks=ids.map(()=>'?').join(',');const [items]=await pool.query(`SELECT order_id,product_id AS id,product_name AS name,qty,unit_price AS price FROM nova_order_items WHERE order_id IN (${marks})`,ids);const grouped=new Map(orders.map(o=>[o.id,[]]));for(const item of items)grouped.get(item.order_id)?.push(item);for(const order of orders)order.items=grouped.get(order.id)||[]} const [categories]=await pool.query('SELECT name FROM nova_categories ORDER BY name'); const [users]=await pool.query(`SELECT firebase_uid AS id,COALESCE(MAX(NULLIF(customer_name,'')),MAX(customer_email),'عميل') AS name,MAX(customer_email) AS email,COUNT(*) AS orders_count,SUM(CASE WHEN payment_status='paid' THEN total ELSE 0 END) AS paid_total,MAX(created_at) AS last_order FROM nova_orders GROUP BY firebase_uid ORDER BY last_order DESC LIMIT 500`); const names=[...adminRecordResources],marks=names.map(()=>'?').join(',');const [records]=await pool.query(`SELECT id,resource,title,status,amount,details,created_at,updated_at FROM nova_admin_records WHERE resource IN (${marks}) ORDER BY created_at DESC LIMIT 5000`,names);const moduleRecords=Object.fromEntries(names.map(name=>[name,[]]));for(const row of records)moduleRecords[row.resource].push(row);res.json({products,orders,categories:categories.map(x=>x.name),users,moduleRecords,health:{database:true,paypal:Boolean(process.env.PAYPAL_CLIENT_ID&&process.env.PAYPAL_CLIENT_SECRET)}}); });
+
+app.post('/api/orders', checkDb, authUser, async (req,res)=>{
+  const {items,customerName,phone,note}=req.body||{}; if(!Array.isArray(items)||!items.length) return res.status(400).json({error:'السلة فارغة.'});
+  const ids=items.map(x=>x.id); const [products]=await pool.query(`SELECT * FROM nova_products WHERE active=1 AND id IN (${ids.map(()=>'?').join(',')})`,ids); const byId=new Map(products.map(p=>[p.id,p]));
+  let total=0; const normalized=[]; for(const item of items){ const p=byId.get(item.id),qty=Math.max(1,Math.min(99,Number(item.qty)||1)); if(!p) return res.status(400).json({error:'أحد المنتجات لم يعد متاحاً.'}); total+=Number(p.price)*qty; normalized.push({p,qty}); }
+  const id=orderId(); const c=await pool.getConnection(); try { await c.beginTransaction(); await c.query('INSERT INTO nova_orders (id,firebase_uid,customer_email,customer_name,phone,note,total) VALUES (?,?,?,?,?,?,?)',[id,req.user.uid,req.user.email,customerName||'',phone||'',note||'',total]); for(const x of normalized) await c.query('INSERT INTO nova_order_items (order_id,product_id,product_name,qty,unit_price) VALUES (?,?,?,?,?)',[id,x.p.id,x.p.name,x.qty,x.p.price]); await c.commit(); res.json({id,total,currency:'USD'}); } catch(e){ await c.rollback(); throw e; } finally { c.release(); }
+});
+app.post('/api/paypal/create-order', checkDb, authUser, async (req,res)=>{ try { const id=String(req.body?.orderId||''); const [rows]=await pool.query('SELECT * FROM nova_orders WHERE id=? AND firebase_uid=? AND status="pending"',[id,req.user.uid]); if(!rows.length) return res.status(404).json({error:'الطلب غير موجود.'}); const o=rows[0]; const pp=await paypal('/v2/checkout/orders',{method:'POST',body:JSON.stringify({intent:'CAPTURE',purchase_units:[{reference_id:o.id,custom_id:o.id,amount:{currency_code:o.currency,value:Number(o.total).toFixed(2)},description:'Maro Store digital order'}],application_context:{brand_name:'Maro Store',user_action:'PAY_NOW',return_url:`${origin(req)}/?paypal=success&order=${encodeURIComponent(o.id)}`,cancel_url:`${origin(req)}/?paypal=cancel&order=${encodeURIComponent(o.id)}`}})}); const approve=pp.links?.find(x=>x.rel==='approve')?.href; await pool.query('UPDATE nova_orders SET paypal_order_id=? WHERE id=?',[pp.id,o.id]); res.json({paypalOrderId:pp.id,approvalUrl:approve}); } catch(e){ console.error(e); res.status(502).json({error:e.message.includes('PayPal token failed')?'بيانات PayPal غير صحيحة أو غير متطابقة. استخدم Client ID وClient Secret من نفس تطبيق Sandbox.':'تعذر إنشاء عملية PayPal.',details:e.details?.message||e.message}); } });
+async function fulfill(orderIdValue,paypalOrderId,captureId){ const c=await pool.getConnection(); try { await c.beginTransaction(); const [orders]=await c.query('SELECT * FROM nova_orders WHERE id=? FOR UPDATE',[orderIdValue]); if(!orders.length) throw new Error('order missing'); const o=orders[0]; if(o.status==='paid'||o.status==='completed') { await c.commit(); return; } const [items]=await c.query('SELECT * FROM nova_order_items WHERE order_id=?',[orderIdValue]); for(const item of items){ for(let n=0;n<item.qty;n++){ const [codes]=await c.query(`SELECT id,code FROM nova_inventory_codes WHERE product_id=? AND status='available' ORDER BY id LIMIT 1 FOR UPDATE`,[item.product_id]); if(!codes.length) throw new Error(`No inventory for ${item.product_id}`); await c.query(`UPDATE nova_inventory_codes SET status='sold',order_id=?,sold_at=NOW() WHERE id=?`,[orderIdValue,codes[0].id]); await c.query('INSERT INTO nova_order_codes (order_id,product_id,code) VALUES (?,?,?)',[orderIdValue,item.product_id,codes[0].code]); } } await c.query('UPDATE nova_orders SET status="paid",payment_status="paid",paypal_capture_id=?,paypal_order_id=? WHERE id=?',[captureId,ppId,orderIdValue]); await c.commit(); } catch(e){ await c.rollback(); throw e; } finally { c.release(); } }
+app.post('/api/paypal/capture-order', checkDb, authUser, async (req,res)=>{ try { const id=String(req.body?.orderId||''), ppId=String(req.body?.paypalOrderId||''); const [rows]=await pool.query('SELECT * FROM nova_orders WHERE id=? AND firebase_uid=?',[id,req.user.uid]); if(!rows.length) return res.status(404).json({error:'الطلب غير موجود.'}); const result=await paypal(`/v2/checkout/orders/${encodeURIComponent(ppId)}/capture`,{method:'POST',body:'{}'}); const capture=result.purchase_units?.[0]?.payments?.captures?.[0]; await fulfill(id,ppId,capture?.id||''); const [codes]=await pool.query('SELECT product_id,code FROM nova_order_codes WHERE order_id=?',[id]); res.json({ok:true,status:result.status,codes}); } catch(e){ console.error(e); res.status(502).json({error:'تعذر تأكيد الدفع أو تسليم الكود.',details:e.details?.message||e.message}); } });
+app.get('/api/my-orders', checkDb, authUser, async (req,res)=>{ const [orders]=await pool.query('SELECT * FROM nova_orders WHERE firebase_uid=? ORDER BY created_at DESC',[req.user.uid]); for(const o of orders){ const [codes]=await pool.query('SELECT product_id,code FROM nova_order_codes WHERE order_id=?',[o.id]); o.codes=codes; } res.json(orders); });
+
+app.use(express.static(__dirname, { extensions:['html'] }));
+app.use((err,_req,res,_next)=>{ console.error(err); res.status(500).json({error:'حدث خطأ داخلي.'}); });
+
+// تشغيل السيرفر أولاً، ثم محاولة الاتصال بقاعدة البيانات
+app.listen(PORT, '0.0.0.0', async () => {
+    console.log(`✅ Maro Store server listening on port ${PORT}`);
+    try {
+        await migrate();
+        console.log("✅ Database is connected and ready.");
+    } catch (error) {
+        console.error("⚠️ Database connection failed. Server is running, but database features are offline.");
+        console.error(error.message);
     }
 });
-
-authReady.then(()=>onAuthStateChanged(auth,user=>{if(user)verifyAdmin(user);else showLogin()}));
-
-$('#logoutBtn').addEventListener('click',async()=>{
-    showLogin('');
-    $('#loginPassword').value='';
-    await signOut(auth)
-});
-
-mountModules();
-renderAll();
-})();
-</script>
-</body>
-</html>
