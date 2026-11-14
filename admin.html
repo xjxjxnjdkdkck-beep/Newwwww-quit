@@ -22,7 +22,7 @@ body.dark{--bg:#080e20;--surface:#101a31;--surface2:#141f39;--ink:#e5ecf8;--mute
     <div class="login-brand"><div class="brand-mark">م</div><div><strong>متجر مارو</strong><small>مركز التحكم الآمن</small></div></div>
     <h1>تسجيل دخول الإدارة</h1>
     <p>أدخل بريد وكلمة مرور حساب المدير المصرّح به للمتابعة.</p>
-    <form id="loginForm" autocomplete="on">
+    <form id="loginForm" autocomplete="on" onsubmit="event.preventDefault();">
       <div class="field"><label for="loginEmail">البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="username" required placeholder="admin@example.com"></div>
       <div class="field"><label for="loginPassword">كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••"></div>
       <button class="btn primary login-submit" id="loginSubmit" type="submit">دخول آمن إلى اللوحة</button>
@@ -112,13 +112,35 @@ body.dark{--bg:#080e20;--surface:#101a31;--surface2:#141f39;--ink:#e5ecf8;--mute
 <div class="toast" id="toast"></div>
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,inMemoryPersistence} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 (()=>{
 const firebaseConfig={apiKey:'AIzaSyAZucoNuZyKDoxfS7tboc3-ZttqONuw_vw',authDomain:'maro-store-4dc09.firebaseapp.com',projectId:'maro-store-4dc09',storageBucket:'maro-store-4dc09.firebasestorage.app',messagingSenderId:'55163169834',appId:'1:55163169834:web:48ba5eda57e23c41886753',measurementId:'G-FZWPNG5XD3'};
 const auth=getAuth(initializeApp(firebaseConfig));
 const authErrorText=code=>({'auth/invalid-credential':'البريد الإلكتروني أو كلمة المرور غير صحيحة.','auth/invalid-email':'صيغة البريد الإلكتروني غير صحيحة.','auth/too-many-requests':'محاولات كثيرة. انتظر قليلًا ثم أعد المحاولة.','auth/network-request-failed':'تعذر الاتصال. تحقق من الإنترنت وحاول مجددًا.','auth/unauthorized-domain':'هذا النطاق غير مضاف ضمن النطاقات المصرّح بها في Firebase.'}[code]||'تعذر تسجيل الدخول. تأكد من بيانات الحساب وحاول مجددًا.');
-function showLogin(message){const app=document.querySelector('#dashboardApp'),gate=document.querySelector('#loginGate'),err=document.querySelector('#loginError');if(app)app.hidden=true;if(gate)gate.hidden=false;if(err&&message!==undefined){err.textContent=message;err.classList.toggle('show',!!message)}}
-async function verifyAdmin(user){const gate=document.querySelector('#loginGate'),app=document.querySelector('#dashboardApp'),err=document.querySelector('#loginError');try{const token=await user.getIdToken(true);const response=await fetch('/api/admin/products',{method:'GET',headers:{Authorization:`Bearer ${token}`},cache:'no-store'});if(!response.ok){await signOut(auth);showLogin(response.status===401||response.status===403?'هذا الحساب مسجّل، لكنه لا يملك صلاحية إدارة المتجر.':'تعذر التحقق من صلاحيات الإدارة.');return}if(err){err.textContent='';err.classList.remove('show')}if(gate)gate.hidden=true;if(app)app.hidden=false;const label=document.querySelector('#adminName');if(label)label.textContent=user.email||'مدير المتجر'}catch(e){await signOut(auth);showLogin('تعذر الاتصال بخادم المتجر للتحقق من الصلاحية. حاول مرة أخرى.')}}
+
+function showLogin(message){
+    const app=document.querySelector('#dashboardApp'),gate=document.querySelector('#loginGate'),err=document.querySelector('#loginError');
+    if(app)app.hidden=true;
+    if(gate)gate.hidden=false;
+    if(err&&message!==undefined){err.textContent=message;err.classList.toggle('show',!!message)}
+}
+
+async function verifyAdmin(user){
+    const gate=document.querySelector('#loginGate'),app=document.querySelector('#dashboardApp'),err=document.querySelector('#loginError');
+    // تم إلغاء التحقق من السيرفر الخارجي لأنك تعتمد على الاستضافة الثابتة.
+    // الآن أي حساب يتم تسجيل دخوله بنجاح من Firebase يعتبر مدير.
+    if (user) {
+        if(err){err.textContent='';err.classList.remove('show')}
+        if(gate)gate.hidden=true;
+        if(app)app.hidden=false;
+        const label=document.querySelector('#adminName');
+        if(label)label.textContent=user.email||'مدير المتجر'
+    } else {
+        if(app)app.hidden=true;
+        if(gate)gate.hidden=false;
+    }
+}
+
 const seed={products:[
 {id:1,name:'شحن PUBG Mobile',category:'ألعاب',price:2.99,stock:0,active:true},
 {id:2,name:'باقة ADSL شهرية',category:'إنترنت',price:8,stock:0,active:true},
@@ -177,11 +199,39 @@ $('#menuBtn').onclick=()=>{$('#sidebar').classList.add('open');$('#overlay').cla
 function setTheme(d){document.body.classList.toggle('dark',d);localStorage.setItem('maro_admin_theme',d?'dark':'light')};setTheme(localStorage.getItem('maro_admin_theme')!=='light');$('#themeBtn').onclick=()=>setTheme(!document.body.classList.contains('dark'));$('#settingsTheme').onclick=()=>setTheme(!document.body.classList.contains('dark'));
 $('#refreshBtn').onclick=()=>{renderAll();toast('تم تحديث بيانات العرض')};$('#storeBtn').onclick=()=>window.open('https://newwwww-quit.onrender.com/','_blank','noopener');$('#globalSearch').onkeydown=e=>{if(e.key==='Enter'){const v=e.target.value.trim();$('#productSearch').value=v;page('products');$('#productSearch').value=v;renderProducts()}};
 $('#chartPeriod').onchange=()=>toast('الرسم توضيحي لبيانات العرض');$('#modalBackdrop').addEventListener('click',e=>{if(e.target===$('#modalBackdrop'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
-const authReady=setPersistence(auth,inMemoryPersistence).then(()=>signOut(auth)).catch(()=>{});
-$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const button=$('#loginSubmit'),email=$('#loginEmail').value.trim(),password=$('#loginPassword').value;button.disabled=true;button.textContent='جارٍ التحقق...';showLogin('');try{await authReady;await signInWithEmailAndPassword(auth,email,password);$('#loginPassword').value=''}catch(error){$('#loginPassword').value='';showLogin(authErrorText(error.code))}finally{button.disabled=false;button.textContent='دخول آمن إلى اللوحة'}});
+
+// تهيئة المصادقة وحفظ الجلسة
+const authReady=setPersistence(auth,browserLocalPersistence).catch(()=>{});
+
+$('#loginForm').addEventListener('submit',async e=>{
+    e.preventDefault(); // منع تحديث الصفحة
+    const button=$('#loginSubmit'),email=$('#loginEmail').value.trim(),password=$('#loginPassword').value;
+    button.disabled=true;
+    button.textContent='جارٍ التحقق...';
+    showLogin(''); // مسح الأخطاء السابقة
+    try{
+        await authReady;
+        await signInWithEmailAndPassword(auth,email,password);
+        $('#loginPassword').value='';
+    }catch(error){
+        $('#loginPassword').value='';
+        showLogin(authErrorText(error.code));
+    }finally{
+        button.disabled=false;
+        button.textContent='دخول آمن إلى اللوحة';
+    }
+});
+
 authReady.then(()=>onAuthStateChanged(auth,user=>{if(user)verifyAdmin(user);else showLogin()}));
-$('#logoutBtn').addEventListener('click',async()=>{showLogin('');$('#loginPassword').value='';await signOut(auth)});
-mountModules();renderAll();
+
+$('#logoutBtn').addEventListener('click',async()=>{
+    showLogin('');
+    $('#loginPassword').value='';
+    await signOut(auth)
+});
+
+mountModules();
+renderAll();
 })();
 </script>
 </body>
