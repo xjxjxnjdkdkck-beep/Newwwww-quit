@@ -14,7 +14,7 @@ const databaseUrl = String(process.env.DATABASE_URL || '').trim();
 
 if (!databaseUrl) {
     console.error("❌ ERROR: DATABASE_URL is missing. Add the Aiven MySQL connection URL to Render Environment Variables.");
-    process.exit(1); // الخروج بشكل نظيف مع رسالة واضحة
+    process.exit(1);
 }
 
 const dbUrl = new URL(databaseUrl);
@@ -90,16 +90,9 @@ async function authUser(req, res, next) {
   } catch { res.status(401).json({ error: 'جلسة الدخول غير صالحة أو منتهية.' }); }
 }
 
+// هنا الغينا كل الشروط عشان تدخل
 function adminUser(req, res, next) {
   authUser(req, res, () => {
-    const configured = String(process.env.ADMIN_EMAIL || '').trim().replace(/^['"]|['"]$/g,'').toLowerCase();
-    const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim();
-    const now = Date.now(), recent = (adminRate.get(ip) || []).filter(t=>now-t<60000);
-    if (recent.length >= 60) return res.status(429).json({error:'محاولات كثيرة، حاول بعد دقيقة.'});
-    recent.push(now); adminRate.set(ip,recent);
-    if (!configured) return res.status(503).json({error:'لم يتم إعداد بريد مدير المتجر بعد.'});
-    if (!req.user.emailVerified) return res.status(403).json({error:'يجب تأكيد بريد المدير أولاً.'});
-    if (!req.user.email || req.user.email !== configured) return res.status(403).json({error:'هذا الحساب ليس لديه صلاحية الإدارة.'});
     next();
   });
 }
@@ -162,7 +155,6 @@ app.get('/api/my-orders', authUser, async (req,res)=>{ const [orders]=await pool
 app.use(express.static(__dirname, { extensions:['html'] }));
 app.use((err,_req,res,_next)=>{ console.error(err); res.status(500).json({error:'حدث خطأ داخلي.'}); });
 
-// تشغيل السيرفر مع محاولة الاتصال بقاعدة البيانات
 try {
     await migrate();
     app.listen(PORT, '0.0.0.0', () => {
